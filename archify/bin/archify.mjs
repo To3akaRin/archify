@@ -576,6 +576,8 @@ async function commandCompare(args) {
   const headCandidate = path.join(stagingDirectory, 'head.html');
   const rawBaseCandidate = path.join(stagingDirectory, 'base.raw.html');
   const rawHeadCandidate = path.join(stagingDirectory, 'head.raw.html');
+  const rawBaseInput = path.join(stagingDirectory, 'base.snapshot.json');
+  const rawHeadInput = path.join(stagingDirectory, 'head.snapshot.json');
   const canonicalBaseInput = path.join(stagingDirectory, 'base.architecture.json');
   const canonicalHeadInput = path.join(stagingDirectory, 'head.architecture.json');
   const htmlCandidate = path.join(stagingDirectory, path.basename(outputPath));
@@ -585,7 +587,9 @@ async function commandCompare(args) {
     let baseResult;
     let headResult;
     try {
-      renderValidatedArchitecture(basePath, rawBaseCandidate, qualityArgs.quality, repoArgs.repoRoot);
+      // 校验与哈希、差异计算使用同一份原始字节，避免重读已变化的路径。
+      fs.writeFileSync(rawBaseInput, baseBuffer, { flag: 'wx' });
+      renderValidatedArchitecture(rawBaseInput, rawBaseCandidate, qualityArgs.quality, repoArgs.repoRoot);
     } catch (error) {
       const diagnosticEntry = error.diagnostics?.[0];
       reportCompareFailure({
@@ -599,7 +603,8 @@ async function commandCompare(args) {
       return;
     }
     try {
-      renderValidatedArchitecture(headPath, rawHeadCandidate, qualityArgs.quality, repoArgs.repoRoot);
+      fs.writeFileSync(rawHeadInput, headBuffer, { flag: 'wx' });
+      renderValidatedArchitecture(rawHeadInput, rawHeadCandidate, qualityArgs.quality, repoArgs.repoRoot);
     } catch (error) {
       const diagnosticEntry = error.diagnostics?.[0];
       reportCompareFailure({
