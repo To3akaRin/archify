@@ -189,7 +189,10 @@ proximity or naming alone.
 Declare `meta.repository.url` and one full 40-character `revision`, then attach
 `components[].sources` with repository-relative `path`, optional `line`,
 `end_line`, and `label`. Verification reads blobs at that commit, independently
-of working-tree edits. A matching local origin, available commit, bounded path,
+of working-tree edits. 本地 Git replacement refs（包括自定义
+`GIT_REPLACE_REF_BASE`）不会参与校验；读取的始终是指定 SHA 的原始对象，
+不会修改仓库配置或删除 replacement refs。
+A matching local origin, available commit, bounded path,
 blob, and valid line range are required in every link mode. Verification is
 local and makes no remote requests; it establishes neither public availability
 nor the current reader's access rights.
