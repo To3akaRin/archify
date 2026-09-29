@@ -174,15 +174,21 @@ export function createLifecycleGridRouter(states, transitions, { rowOf, columnXs
   // 只修复超出画布的外绕轨道。端点、节点和作者坐标保持不变；
   // 预算包括 crossover halo，轨道之间至少留 1px，不能靠重叠消除越界。
   const loopPadding = transition => ((transition.width || (transition.variant === 'emphasis' ? 1.6 : 1.1)) + 4) / 2;
-  function fitOuterLoops(entries, side, edge) {
+  function fitOuterLoops(entries, side, edge, compact = false) {
     const padding = Math.max(...entries.map(([transition]) => loopPadding(transition)));
     const space = (side === 'left' ? edge : canvasWidth - edge) - padding;
-    const spacing = entries.length > 1 ? Math.min(Math.max(CORRIDOR_SPACING, padding * 2 + 1), (space - 8) / (entries.length - 1)) : 0;
+    const preferredSpacing = compact ? padding * 2 + 1 : Math.max(CORRIDOR_SPACING, padding * 2 + 1);
+    const spacing = entries.length > 1 ? Math.min(preferredSpacing, (space - 8) / (entries.length - 1)) : 0;
     if (space < 8 || (entries.length > 1 && spacing < padding * 2 + 1)) return null;
-    const inset = Math.min(18, space - spacing * (entries.length - 1));
+    const inset = compact ? 8 : Math.min(18, space - spacing * (entries.length - 1));
     return entries.map((_, index) => edge + (side === 'left' ? -1 : 1) * (inset + index * spacing));
   }
 
+  // 与 renderState() 的 initialMarkerShape(x - 22, x - 1, cy) 一致：
+  // 圆点半径 4.5px，箭线和箭头都包含在这段标记区域中。
+  const initialMarkers = allStates.filter(state => state.type === 'start').map(state => ({
+    x: state.x - 26.5, y: state.cy - 4.5, width: 25.5, height: 9,
+  }));
   function clearAlternateLoop(plan, side, x, padding) {
     if (loopBlocked(plan.from, plan.to, side)) return false;
     const bounds = (left, right, top, bottom) => ({ x: left, y: top, width: right - left, height: bottom - top });
@@ -193,8 +199,9 @@ export function createLifecycleGridRouter(states, transitions, { rowOf, columnXs
     // 用完整端口高度检查候选，避免重新分配端口后才撞到相邻状态。
     const corridors = [horizontal(plan.from), horizontal(plan.to),
       bounds(x, x, Math.min(plan.from.y, plan.to.y), Math.max(plan.from.y + plan.from.height, plan.to.y + plan.to.height))];
-    return allStates.every(state => state === plan.from || state === plan.to
-      || corridors.every(corridor => !rectsOverlap(corridor, state, Math.max(6, padding + 2))));
+    const clear = obstacle => corridors.every(corridor => !rectsOverlap(corridor, obstacle, Math.max(6, padding + 2)));
+    return allStates.every(state => state === plan.from || state === plan.to || clear(state))
+      && initialMarkers.every(clear);
   }
 
   if (Number.isFinite(canvasWidth)) {
@@ -202,6 +209,9 @@ export function createLifecycleGridRouter(states, transitions, { rowOf, columnXs
     const groups = ['left', 'right'].map(side => [side, [...plans]
       .filter(([, plan]) => plan.kind === 'loop' && plan.side === side)
       .sort(([, a], [, b]) => Math.abs(rowOf(a.from) - rowOf(a.to)) - Math.abs(rowOf(b.from) - rowOf(b.to)))]);
+    // 两侧同时向内换道时先紧凑布局，避免相向的端点线合并成同一走廊。
+    const compactAlternates = groups.every(([side, entries]) => entries.length
+      && !fitOuterLoops(entries, side, side === 'left' ? gridLeft : gridRight));
     for (const [side, entries] of groups) {
       if (!entries.length || entries.every(([transition, plan]) => {
         const padding = loopPadding(transition);
@@ -217,9 +227,16 @@ export function createLifecycleGridRouter(states, transitions, { rowOf, columnXs
         const endpoints = entries.flatMap(([, plan]) => [plan.from, plan.to]);
         const edge = targetSide === 'left' ? Math.min(...endpoints.map(state => state.x))
           : Math.max(...endpoints.map(state => state.x + state.width));
-        positions = fitOuterLoops(entries, targetSide, edge);
-        if (positions && !entries.every(([transition, plan], index) =>
-          clearAlternateLoop(plan, targetSide, positions[index], loopPadding(transition)))) positions = null;
+        // 仅两个确定性候选：常规间距与仍保留 halo 间 1px 的
+        // 紧凑轨道。检查装饰和节点，不靠回退负坐标避开障碍。
+        for (const compact of compactAlternates ? [true, false] : [false, true]) {
+          const candidate = fitOuterLoops(entries, targetSide, edge, compact);
+          if (candidate && entries.every(([transition, plan], index) =>
+            clearAlternateLoop(plan, targetSide, candidate[index], loopPadding(transition)))) {
+            positions = candidate;
+            break;
+          }
+        }
       }
       if (!positions) continue;
       entries.forEach(([, plan], index) => {

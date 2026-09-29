@@ -161,3 +161,43 @@ test('start 状态初始标记保持可用，外绕仍避开其左侧', t => {
   assert.match(result.svg, /<circle cx="854" cy="88" r="4\.5"/);
   for (const route of result.routes) assert.ok(route.points[1][0] > result.nodes.a.x + result.nodes.a.width);
 });
+
+test('换侧走廊避开其他列的初始圆点和箭线，并保留可见轨道间距', t => {
+  const doc = document({ count: 10 });
+  doc.states = [...doc.states.slice(0, 3),
+    { id: 'marker', type: 'start', label: 'M', lane: 'wait', col: 1, width: 48 },
+    { id: 'wide', type: 'active', label: 'Wide', lane: 'terminal', col: 1, width: 160 },
+  ];
+  doc.transitions = doc.transitions.map((transition, index) => ({ ...transition,
+    from: index % 2 ? 'c' : 'a', to: index % 2 ? 'a' : 'c' }));
+  const result = deliver(t, doc);
+  contained(result, doc);
+  const [dotX, dotY, radius] = result.svg.match(/data-lifecycle-initial-marker=""[^>]*>\s*<circle cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)"/).slice(1).map(Number);
+  assert.deepEqual([dotX, dotY, radius], [298, 272, 4.5], '固定实际渲染标记的几何');
+  for (const route of result.routes) {
+    const inset = (route.stroke + 4) / 2;
+    const [start, end] = route.points.slice(1, 3);
+    assert.ok(Math.min(start[1], end[1]) < dotY && Math.max(start[1], end[1]) > dotY);
+    assert.ok(start[0] + inset < dotX - radius || start[0] - inset > result.nodes.marker.x - 1,
+      `${route.id} 外绕轨道与其他列的初始标记重叠: ${start[0]}`);
+  }
+});
+
+test('左右两组都需要换到内侧时，不形成新的共享水平走廊', t => {
+  const doc = document({ count: 10, viewBox: [554, 800] });
+  doc.states = doc.states.slice(0, 3);
+  doc.transitions = doc.transitions.map((transition, index) => ({ ...transition,
+    from: index % 2 ? 'c' : 'a', to: index % 2 ? 'a' : 'c' }));
+  const rename = id => ({ a: 'x', b: 'y', c: 'z' })[id];
+  doc.states.push(...doc.states.map(state => ({ ...state, id: rename(state.id), col: 1 })));
+  doc.transitions.push(...doc.transitions.map(transition => ({ ...transition,
+    id: `right-${transition.id}`, from: rename(transition.from), to: rename(transition.to) })));
+  doc.transitions.push({ id: 'space', from: 'a', to: 'x', label: 'abcdefghijklmnopqrstuvwx' });
+  const result = deliver(t, doc);
+  contained(result, doc);
+  const left = result.routes.filter(route => /^t\d+$/.test(route.id));
+  const right = result.routes.filter(route => route.id.startsWith('right-'));
+  assert.ok(Math.max(...left.map(route => route.points[1][0] + (route.stroke + 4) / 2))
+    < Math.min(...right.map(route => route.points[1][0] - (route.stroke + 4) / 2)),
+  '两组相向的水平线段及 halo 之间必须留有间隔');
+});
