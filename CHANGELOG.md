@@ -4,9 +4,16 @@ All notable changes are documented here. Format loosely follows [Keep a Changelo
 
 ## [Unreleased]
 
+> Development identity: `v3.0.2-dev.1`. Not a stable release.
+
 ### Fixed
 
 - **WebP brand container bounds (#602).** Reject missing or out-of-bounds image chunks, including incomplete animation frames, before reporting capture or pinned validation success. Preserve valid lossy, lossless, extended and animated containers and original-byte digests.
+
+## [3.0.1] — 2026-09-28
+
+### Changed
+- **Update reminders at final delivery.** `finalize` and standalone `deliver` now carry a bounded stable-release check in human output and full/compact receipts. A known newer release appears once in each task's final response until the user upgrades or explicitly snoozes it for seven days or ignores that exact release. The old acknowledgement command remains a no-op, so it cannot silently hide an update. The checker reuses the fixed official manifest, validated cache, and path protections; slow or offline checks never block diagram delivery. No automatic installation or diagram-output change is introduced.
 
 ## [3.0.0] — 2026-09-28
 
