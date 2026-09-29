@@ -4,6 +4,19 @@ All notable changes are documented here. Format loosely follows [Keep a Changelo
 
 ## [Unreleased]
 
+### Fixed
+
+- **Architecture Delta translation changes (#600).** Compare reports additions, removals and edits to `meta.translations` as presentation changes; translation-key order does not affect the result or entity-change counts.
+
+## [3.0.0] — 2026-09-28
+
+### Upgrading from 2.x
+
+- The Viewer has a redesigned reader layout. Guided/story views and ordinary share-card exports have been removed; use the diagram overview, Route, Lens and canonical exports. Already generated standalone HTML keeps its embedded viewer.
+- Existing schema-v1 diagram inputs remain supported. Lifecycle schema v2 is the recommended path for newly authored lifecycle diagrams; migration is not required to keep rendering v1 inputs.
+- English and Simplified Chinese remain built in. Supply `meta.translations` for other Viewer languages; authored node and message text is separate from Viewer UI translation.
+- Stable release identity is now `v3.0.0`; the previous `2.17.0-dev.1` identity was a development candidate, not a stable release.
+
 ### Improved reading
 
 - **Sequence width review.** `finalize` now reports measured unused right-hand space when fixed participant columns crowd one side of a wide canvas. New unpinned candidates get a bounded `column_fit: "spread"` repair step; explicit fixed and legacy layouts keep their geometry, and the advice adds no validation warning or failure.
@@ -15,8 +28,6 @@ All notable changes are documented here. Format loosely follows [Keep a Changelo
 - Showcase sequence message names use larger primary type and matching label plates; real browser readability checks now include message labels.
 - **Clearer Architecture layouts.** Authoring defaults now classify each relationship (main path, branch or store, return, second entrance, fan-out) before placement, with a measured side length for fan-out ports. A passing `finalize` receipt with crossings adds node-move `hints`, backed by new `routeReview` evidence (`sharedNode` on crossings, `crowdedSides` when a side faces more neighbours than it has ports); the Skill allows one bounded, position-only repair for crossings. Automatic routing steps fan-out siblings into free parallel channels and reaches a blocked row of neighbours through one vertical side instead of wrapping around it.
 
-> Development identity: `v2.17.0-dev.1`. Not a stable release.
-
 ### Added
 - **Hermes Agent community opt-in.** `integrations/hermes-agent` is a Skill-only directory plugin: it registers the existing Node Archify `SKILL.md` for Hermes. The documented install is `hermes skills install skills-sh/tt-a1i/archify/archify -y` (published GitHub Skill). A checkout symlink remains the local-dev path. Hermes still runs `node bin/archify.mjs`. This is not an official Nous product and is not an agent-switcher target.
 - **GitHub Copilot agent-switcher target.** The Start page agent switcher, README EN/ZH quick start, and landing copy add `github-copilot` alongside `cursor`, `codex`, `claude-code`, and `opencode`. It installs the same checked Skill and zero-dependency renderers via `npx skills add tt-a1i/archify --skill archify --agent github-copilot ...`; no vendor-specific fork, renderer, or schema behavior was added.
@@ -26,7 +37,6 @@ All notable changes are documented here. Format loosely follows [Keep a Changelo
 - **Japanese entry point under the same maintenance contract.** `README_JA.md` joins the language switcher and every README parity check: brand mark and demo-section placement, the animated proof and demo deep links, share-card and real-repository proofs, the update-awareness disclosure, the Hermes Agent and DSH installation rows, the self-hosted Star History ending, and release-identity validation of the version badge, the Japanese development marker, and the Raven manual-ZIP boundary. The switcher check is now driven by one per-language table, so a future language is added in one place.
 
 ### Fixed
-- **Architecture Delta translation changes (#600).** Compare reports additions, removals and edits to `meta.translations` as presentation changes; translation-key order does not affect the result or entity-change counts.
 - **Node clearance at the solver's exact minimum (#583).** `rectsOverlap` now compares separations with the same `0.0001` numeric tolerance the route and layout geometry already uses, so a column the layout solver separated by exactly its minimum no longer reads as overlapping because of float rounding. Genuine closeness still reports; a shortfall an author could act on remains well outside the tolerance.
 - **Lifecycle transition notes (#549).** Notes render when the transition label is omitted or empty, with matching route-space reservations and collision checks; existing label-only and label-plus-note layouts retain their behavior.
 - **Brand content-encoding negotiation (#514).** Capture and pinned re-fetches request identity encoding and reject unexpected encoded response bodies before parsing or hashing, with the coding error preserved if favicon fallback also fails.
