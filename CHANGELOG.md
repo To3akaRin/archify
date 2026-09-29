@@ -4,9 +4,21 @@ All notable changes are documented here. Format loosely follows [Keep a Changelo
 
 ## [Unreleased]
 
-### Improved reading
+### Fixed
 
 - **Sequence content capacity.** Automatic canvases retain room for late messages, notes, activations, and segments when the legend is hidden or all its entries are hidden. Existing timeline margins, explicit viewBox dimensions, and authored coordinates remain authoritative. Fixes #601.
+
+## [3.0.0] — 2026-09-28
+
+### Upgrading from 2.x
+
+- The Viewer has a redesigned reader layout. Guided/story views and ordinary share-card exports have been removed; use the diagram overview, Route, Lens and canonical exports. Already generated standalone HTML keeps its embedded viewer.
+- Existing schema-v1 diagram inputs remain supported. Lifecycle schema v2 is the recommended path for newly authored lifecycle diagrams; migration is not required to keep rendering v1 inputs.
+- English and Simplified Chinese remain built in. Supply `meta.translations` for other Viewer languages; authored node and message text is separate from Viewer UI translation.
+- Stable release identity is now `v3.0.0`; the previous `2.17.0-dev.1` identity was a development candidate, not a stable release.
+
+### Improved reading
+
 - **Sequence width review.** `finalize` now reports measured unused right-hand space when fixed participant columns crowd one side of a wide canvas. New unpinned candidates get a bounded `column_fit: "spread"` repair step; explicit fixed and legacy layouts keep their geometry, and the advice adds no validation warning or failure.
 - **Lifecycle schema v2.** New lifecycle diagrams render one row per lane on a shared `col` 0–4 grid, so a state placed under the state it leaves gets a straight transition. The renderer sizes the canvas, widens column gaps for same-row labels, opens row gaps for the tracks their routes need, and routes automatic transitions with a dedicated orthogonal grid router (parallel reciprocal pairs, crossing-minimized tracks, corridor and outer-loop detours). Row titles move to a vertical left gutter, the implied phase rail is replaced by authored transitions, and state text is one step larger. Schema v1 files keep their exact state geometry.
 - **Lifecycle marks and legend.** Start states get a UML initial marker and states without outgoing transitions a double border, both explained in the legend; decision no longer shares failure's red, and success is green. The lifecycle type sigil moves to the top-left like every other mode.
@@ -15,8 +27,6 @@ All notable changes are documented here. Format loosely follows [Keep a Changelo
 - **Readable source badges.** The Viewer's source badge is larger, fully opaque, sized to its text, and placed left of the brand mark; lifecycle, workflow, and data-flow label layout now reserve its width, so it no longer covers sigils or labels.
 - Showcase sequence message names use larger primary type and matching label plates; real browser readability checks now include message labels.
 - **Clearer Architecture layouts.** Authoring defaults now classify each relationship (main path, branch or store, return, second entrance, fan-out) before placement, with a measured side length for fan-out ports. A passing `finalize` receipt with crossings adds node-move `hints`, backed by new `routeReview` evidence (`sharedNode` on crossings, `crowdedSides` when a side faces more neighbours than it has ports); the Skill allows one bounded, position-only repair for crossings. Automatic routing steps fan-out siblings into free parallel channels and reaches a blocked row of neighbours through one vertical side instead of wrapping around it.
-
-> Development identity: `v2.17.0-dev.1`. Not a stable release.
 
 ### Added
 - **Hermes Agent community opt-in.** `integrations/hermes-agent` is a Skill-only directory plugin: it registers the existing Node Archify `SKILL.md` for Hermes. The documented install is `hermes skills install skills-sh/tt-a1i/archify/archify -y` (published GitHub Skill). A checkout symlink remains the local-dev path. Hermes still runs `node bin/archify.mjs`. This is not an official Nous product and is not an agent-switcher target.
