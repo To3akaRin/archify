@@ -97,6 +97,15 @@ grid router's chosen sides keep its routes and adaptive row gaps. If an automati
 transition pins a different side, the scene uses the shared side-aware obstacle
 planner, retaining the v2 state grid and shared port spreading.
 
+v2 外绕路径与最终 SVG 使用同一水平预算。已有路径（包括 crossover halo）
+位于画布内时保持原几何；越界时只调整外绕轨道，在轨道的 halo 之间保留至少
+1px、端点出线保留至少 8px。原侧空间不足时，未固定侧边的关系可改走另一侧
+经检查无节点或初始标记阻挡的走廊。节点、画布原点、显式 `viewBox`、
+`via` 和 `channelX/channelY` 不因这一修复平移，关系 ID 和方向保持不变。
+极窄的显式画布与固定侧边或障碍组合仍可能没有可用轨道；此时保留作者约束，
+不会重叠轨道、删除关系或擅改坐标来制造成功。这一修复不保证解决所有显式
+约束布局；需要作者增加画布空间或调整已固定的路由，再运行验证和视觉检查。
+
 ## Layout budget (v1)
 
 | Band | Lane id | Top y | Column centers | Default state |

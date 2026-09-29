@@ -15,6 +15,8 @@
 // the horizontal runs in each gap get their own tracks, ordered to minimize
 // crossings. Reciprocal pairs therefore render as two parallel lines.
 
+import { rectsOverlap } from '../shared/geometry.mjs';
+
 const PORT_GUTTER = 16;
 const PORT_SPACING = 30;
 const SNAP_LIMIT = 16;
@@ -33,7 +35,7 @@ function permutations(items) {
     .map((rest) => [item, ...rest]));
 }
 
-export function createLifecycleGridRouter(states, transitions, { rowOf, columnXs }) {
+export function createLifecycleGridRouter(states, transitions, { rowOf, columnXs, canvasWidth }) {
   const byRow = new Map();
   for (const state of states.values()) {
     const row = rowOf(state);
@@ -167,6 +169,64 @@ export function createLifecycleGridRouter(states, transitions, { rowOf, columnXs
     loops.forEach((plan, index) => {
       plan.loopX = side === 'left' ? gridLeft - 18 - index * CORRIDOR_SPACING : gridRight + 18 + index * CORRIDOR_SPACING;
     });
+  }
+
+  // 只修复超出画布的外绕轨道。端点、节点和作者坐标保持不变；
+  // 预算包括 crossover halo，轨道之间至少留 1px，不能靠重叠消除越界。
+  const loopPadding = transition => ((transition.width || (transition.variant === 'emphasis' ? 1.6 : 1.1)) + 4) / 2;
+  function fitOuterLoops(entries, side, edge) {
+    const padding = Math.max(...entries.map(([transition]) => loopPadding(transition)));
+    const space = (side === 'left' ? edge : canvasWidth - edge) - padding;
+    const spacing = entries.length > 1 ? Math.min(Math.max(CORRIDOR_SPACING, padding * 2 + 1), (space - 8) / (entries.length - 1)) : 0;
+    if (space < 8 || (entries.length > 1 && spacing < padding * 2 + 1)) return null;
+    const inset = Math.min(18, space - spacing * (entries.length - 1));
+    return entries.map((_, index) => edge + (side === 'left' ? -1 : 1) * (inset + index * spacing));
+  }
+
+  function clearAlternateLoop(plan, side, x, padding) {
+    if (loopBlocked(plan.from, plan.to, side)) return false;
+    const bounds = (left, right, top, bottom) => ({ x: left, y: top, width: right - left, height: bottom - top });
+    const horizontal = state => {
+      const edge = side === 'left' ? state.x : state.x + state.width;
+      return bounds(Math.min(x, edge), Math.max(x, edge), state.y, state.y + state.height);
+    };
+    // 用完整端口高度检查候选，避免重新分配端口后才撞到相邻状态。
+    const corridors = [horizontal(plan.from), horizontal(plan.to),
+      bounds(x, x, Math.min(plan.from.y, plan.to.y), Math.max(plan.from.y + plan.from.height, plan.to.y + plan.to.height))];
+    return allStates.every(state => state === plan.from || state === plan.to
+      || corridors.every(corridor => !rectsOverlap(corridor, state, Math.max(6, padding + 2))));
+  }
+
+  if (Number.isFinite(canvasWidth)) {
+    // 固定原分组，防止已经换侧的路线被另一侧再次布局。
+    const groups = ['left', 'right'].map(side => [side, [...plans]
+      .filter(([, plan]) => plan.kind === 'loop' && plan.side === side)
+      .sort(([, a], [, b]) => Math.abs(rowOf(a.from) - rowOf(a.to)) - Math.abs(rowOf(b.from) - rowOf(b.to)))]);
+    for (const [side, entries] of groups) {
+      if (!entries.length || entries.every(([transition, plan]) => {
+        const padding = loopPadding(transition);
+        return plan.loopX >= padding && plan.loopX <= canvasWidth - padding;
+      })) continue;
+      let targetSide = side;
+      let positions = fitOuterLoops(entries, side, side === 'left' ? gridLeft : gridRight);
+      // 窄画布容不下清晰轨道时，未固定侧边的关系可使用状态另一侧
+      // 的空闲走廊；先检查完整候选，失败时保留原有显式约束。
+      if (!positions && entries.every(([transition]) => ['fromSide', 'toSide']
+        .every(key => !transition[key] || transition[key] === 'auto'))) {
+        targetSide = opposite[side];
+        const endpoints = entries.flatMap(([, plan]) => [plan.from, plan.to]);
+        const edge = targetSide === 'left' ? Math.min(...endpoints.map(state => state.x))
+          : Math.max(...endpoints.map(state => state.x + state.width));
+        positions = fitOuterLoops(entries, targetSide, edge);
+        if (positions && !entries.every(([transition, plan], index) =>
+          clearAlternateLoop(plan, targetSide, positions[index], loopPadding(transition)))) positions = null;
+      }
+      if (!positions) continue;
+      entries.forEach(([, plan], index) => {
+        plan.loopX = positions[index];
+        plan.side = plan.fromSide = plan.toSide = targetSide;
+      });
+    }
   }
 
   // Where each end heads after leaving its side, used to order the ports.
