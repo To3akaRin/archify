@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "2e3d2982-b192-4c7a-a0b2-e411c733553a",
+  "ok": true,
+  "command": "deliver",
+  "type": "lifecycle",
+  "input": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/inputs/minimal-six-loops.lifecycle.json",
+  "output": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/minimal-six-loops/after/minimal-six-loops.after.html",
+  "specification": {
+    "sha256": "195f5cd6b68703f4216518043b44888d1faffe4f4c1c27ae450ce73e15e3dde8",
+    "bytes": 1300
+  },
+  "artifact": {
+    "sha256": "b3591be5effca13916844ba99351d3073ecef41e3116916e6560ad09cb3300b7",
+    "bytes": 747050
+  },
+  "validation": {
+    "checksPassed": 9,
+    "checkCount": 9,
+    "compositionProfile": "showcase",
+    "compositionStatus": "pass",
+    "errors": 0,
+    "warnings": 0
+  },
+  "update": {
+    "status": "unavailable",
+    "installedVersion": null,
+    "availableVersion": null,
+    "releaseNotes": null,
+    "checkedAt": null,
+    "source": null,
+    "noticeRequired": false,
+    "noticeText": null,
+    "reason": "disabled"
+  }
+}

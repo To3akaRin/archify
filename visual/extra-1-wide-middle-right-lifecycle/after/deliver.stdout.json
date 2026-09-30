@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "84f2be96-67ae-478c-aa07-3ddf0ccd5e62",
+  "ok": true,
+  "command": "deliver",
+  "type": "lifecycle",
+  "input": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/inputs/extra-1-wide-middle-right-lifecycle.lifecycle.json",
+  "output": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/extra-1-wide-middle-right-lifecycle/after/extra-1-wide-middle-right-lifecycle.after.html",
+  "specification": {
+    "sha256": "3da3fada9669b6430d69ab2d34c938a0a4583dff270fd8a7405e42627b5cc3a7",
+    "bytes": 1654
+  },
+  "artifact": {
+    "sha256": "87ccbf9c71a6dd4f21ca97078428a719b16f4108942cc136051c3388caea0632",
+    "bytes": 752289
+  },
+  "validation": {
+    "checksPassed": 9,
+    "checkCount": 9,
+    "compositionProfile": "showcase",
+    "compositionStatus": "pass",
+    "errors": 0,
+    "warnings": 0
+  },
+  "update": {
+    "status": "unavailable",
+    "installedVersion": null,
+    "availableVersion": null,
+    "releaseNotes": null,
+    "checkedAt": null,
+    "source": null,
+    "noticeRequired": false,
+    "noticeText": null,
+    "reason": "disabled"
+  }
+}

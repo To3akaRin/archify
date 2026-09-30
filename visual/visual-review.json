@@ -1,0 +1,117 @@
+{
+  "reviewer": "Codex",
+  "type": "perceptual-image-review",
+  "maintainerApproval": "pending",
+  "reviewedScreenshots": 12,
+  "supplementalScreenshotsReviewed": false,
+  "records": [
+    {
+      "case": "minimal-six-loops",
+      "theme": "light",
+      "viewport": [
+        1440,
+        900
+      ],
+      "before": {
+        "screenshot": "minimal-six-loops/before/screenshots/minimal-six-loops.before.visual-check.1440x900.light.png",
+        "observation": "修复前左侧竖线被 SVG 边界裁切，同时穿过 Wait、Retry、Terminal 标题区域；自动浏览器测量仍报告 pass。"
+      },
+      "after": {
+        "screenshot": "minimal-six-loops/after/screenshots/minimal-six-loops.after.visual-check.1440x900.light.png",
+        "observation": "六条回线改走节点右侧，完整连接 A/B/C/D；左侧四个标题区域清空，节点标签未被遮挡；可区分平行回线。"
+      },
+      "reviewer": "Codex",
+      "conclusion": "修复后在本次截图范围内满足回线可见性、间距与所含标签/节点/标记避让要求；维护者审查待进行"
+    },
+    {
+      "case": "minimal-six-loops",
+      "theme": "dark",
+      "viewport": [
+        1440,
+        900
+      ],
+      "before": {
+        "screenshot": "minimal-six-loops/before/screenshots/minimal-six-loops.before.visual-check.1440x900.dark.png",
+        "observation": "修复前左侧竖线被 SVG 边界裁切，同时穿过 Wait、Retry、Terminal 标题区域；自动浏览器测量仍报告 pass。"
+      },
+      "after": {
+        "screenshot": "minimal-six-loops/after/screenshots/minimal-six-loops.after.visual-check.1440x900.dark.png",
+        "observation": "六条回线改走节点右侧，完整连接 A/B/C/D；左侧四个标题区域清空，节点标签未被遮挡；可区分平行回线。"
+      },
+      "reviewer": "Codex",
+      "conclusion": "修复后在本次截图范围内满足回线可见性、间距与所含标签/节点/标记避让要求；维护者审查待进行"
+    },
+    {
+      "case": "dense-start-marker",
+      "theme": "light",
+      "viewport": [
+        1440,
+        900
+      ],
+      "before": {
+        "screenshot": "dense-start-marker/before/screenshots/dense-start-marker.before.visual-check.1440x900.light.png",
+        "observation": "修复前部分左侧回线缺失长竖段、只有端点线段抵达裁切边界，main/retry 标题区域拥挤；邻列 M 初始标记原本位于右側。"
+      },
+      "after": {
+        "screenshot": "dense-start-marker/after/screenshots/dense-start-marker.after.visual-check.1440x900.light.png",
+        "observation": "十条线在 A/C 右側紧凑排列，长竖线和弯折均完整可见；与 B 节点、M 的绿色初始圆点及箭线保持可见间隔，泳道和节点标题未被线覆盖。"
+      },
+      "reviewer": "Codex",
+      "conclusion": "修复后在本次截图范围内满足回线可见性、间距与所含标签/节点/标记避让要求；维护者审查待进行"
+    },
+    {
+      "case": "dense-start-marker",
+      "theme": "dark",
+      "viewport": [
+        1440,
+        900
+      ],
+      "before": {
+        "screenshot": "dense-start-marker/before/screenshots/dense-start-marker.before.visual-check.1440x900.dark.png",
+        "observation": "修复前部分左侧回线缺失长竖段、只有端点线段抵达裁切边界，main/retry 标题区域拥挤；邻列 M 初始标记原本位于右側。"
+      },
+      "after": {
+        "screenshot": "dense-start-marker/after/screenshots/dense-start-marker.after.visual-check.1440x900.dark.png",
+        "observation": "十条线在 A/C 右側紧凑排列，长竖线和弯折均完整可见；与 B 节点、M 的绿色初始圆点及箭线保持可见间隔，泳道和节点标题未被线覆盖。"
+      },
+      "reviewer": "Codex",
+      "conclusion": "修复后在本次截图范围内满足回线可见性、间距与所含标签/节点/标记避让要求；维护者审查待进行"
+    },
+    {
+      "case": "extra-1-wide-middle-right-lifecycle",
+      "theme": "light",
+      "viewport": [
+        1440,
+        900
+      ],
+      "before": {
+        "screenshot": "extra-1-wide-middle-right-lifecycle/before/screenshots/extra-1-wide-middle-right-lifecycle.before.visual-check.1440x900.light.png",
+        "observation": "修复前回线在左边界裁切并经过泳道标题，宽节点 b 完整显示。"
+      },
+      "after": {
+        "screenshot": "extra-1-wide-middle-right-lifecycle/after/screenshots/extra-1-wide-middle-right-lifecycle.after.visual-check.1440x900.light.png",
+        "observation": "十条线绕到宽中间节点 b 的右边，最内侧轨道也与 b 的右边框有明显间隔；所有回线和 a/c 箭头完整，未穿过 b 或下方 Outside 节点，左侧标题区域清空。"
+      },
+      "reviewer": "Codex",
+      "conclusion": "修复后在本次截图范围内满足回线可见性、间距与所含标签/节点/标记避让要求；维护者审查待进行"
+    },
+    {
+      "case": "extra-1-wide-middle-right-lifecycle",
+      "theme": "dark",
+      "viewport": [
+        1440,
+        900
+      ],
+      "before": {
+        "screenshot": "extra-1-wide-middle-right-lifecycle/before/screenshots/extra-1-wide-middle-right-lifecycle.before.visual-check.1440x900.dark.png",
+        "observation": "修复前回线在左边界裁切并经过泳道标题，宽节点 b 完整显示。"
+      },
+      "after": {
+        "screenshot": "extra-1-wide-middle-right-lifecycle/after/screenshots/extra-1-wide-middle-right-lifecycle.after.visual-check.1440x900.dark.png",
+        "observation": "十条线绕到宽中间节点 b 的右边，最内侧轨道也与 b 的右边框有明显间隔；所有回线和 a/c 箭头完整，未穿过 b 或下方 Outside 节点，左侧标题区域清空。"
+      },
+      "reviewer": "Codex",
+      "conclusion": "修复后在本次截图范围内满足回线可见性、间距与所含标签/节点/标记避让要求；维护者审查待进行"
+    }
+  ]
+}

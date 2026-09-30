@@ -1,0 +1,241 @@
+{
+  "base": "6bc47e51fc95c153a71e36df411546ef60d3908d",
+  "candidate": "c45ea534a405303890f4795e03412cffb849b1a8",
+  "toolchain": {
+    "executable": "/Users/huangjing/.nvm/versions/node/v22.23.1/bin/node",
+    "node": "22.23.1",
+    "zlib": "1.3.1-e00f703"
+  },
+  "sourceOfInputList": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260929/implementation-lifecycle/compatibility-base.json",
+  "count": 8,
+  "byteIdenticalCount": 8,
+  "results": [
+    {
+      "input": "agent-run.lifecycle.json",
+      "source": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-lifecycle-route-bounds/archify/examples/agent-run.lifecycle.json",
+      "inputSha256": "230242a7557663877766c43a9fe7cffe8b4fb66e4866457dccd24c63175b4917",
+      "schemaVersion": 1,
+      "transitionCount": 6,
+      "stateColumns": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "runs": {
+        "base": {
+          "exitCode": 0,
+          "html": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/base/agent-run.lifecycle.html",
+          "htmlSha256": "99dfa39c258ed8009c1b312dde565fad3f81eaf9ffa181fcd0dd6cc818722040",
+          "bytes": 758920,
+          "log": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/logs/agent-run.lifecycle-base.log"
+        },
+        "candidate": {
+          "exitCode": 0,
+          "html": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/candidate/agent-run.lifecycle.html",
+          "htmlSha256": "99dfa39c258ed8009c1b312dde565fad3f81eaf9ffa181fcd0dd6cc818722040",
+          "bytes": 758920,
+          "log": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/logs/agent-run.lifecycle-candidate.log"
+        }
+      },
+      "baseAndCandidateExampleInputEqual": true,
+      "fullHtmlByteIdentical": true
+    },
+    {
+      "input": "deployment-release.lifecycle.json",
+      "source": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-lifecycle-route-bounds/archify/examples/deployment-release.lifecycle.json",
+      "inputSha256": "f565a8acfebdb21453e2bccd82d3760b4736e38fe194fb2f0804b57817eba813",
+      "schemaVersion": 2,
+      "transitionCount": 11,
+      "stateColumns": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "runs": {
+        "base": {
+          "exitCode": 0,
+          "html": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/base/deployment-release.lifecycle.html",
+          "htmlSha256": "24279a5e329c5e0de5e1f8ecefd3d0f799e1381f9cb9779abe4db5c8cae8d3f7",
+          "bytes": 765975,
+          "log": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/logs/deployment-release.lifecycle-base.log"
+        },
+        "candidate": {
+          "exitCode": 0,
+          "html": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/candidate/deployment-release.lifecycle.html",
+          "htmlSha256": "24279a5e329c5e0de5e1f8ecefd3d0f799e1381f9cb9779abe4db5c8cae8d3f7",
+          "bytes": 765975,
+          "log": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/logs/deployment-release.lifecycle-candidate.log"
+        }
+      },
+      "baseAndCandidateExampleInputEqual": true,
+      "fullHtmlByteIdentical": true
+    },
+    {
+      "input": "outer-loop-1.json",
+      "source": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260929/research-rendering/outer-loop-1.json",
+      "inputSha256": "f7526d59a6a6de59e357b743b6743e907ef3b641f4cff221349e4716012fac42",
+      "schemaVersion": 2,
+      "transitionCount": 1,
+      "stateColumns": [
+        0
+      ],
+      "runs": {
+        "base": {
+          "exitCode": 0,
+          "html": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/base/outer-loop-1.html",
+          "htmlSha256": "213134ca7479669d66212228b072eb97ebc44caa3b213d2bfffed0972ccf9569",
+          "bytes": 743898,
+          "log": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/logs/outer-loop-1-base.log"
+        },
+        "candidate": {
+          "exitCode": 0,
+          "html": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/candidate/outer-loop-1.html",
+          "htmlSha256": "213134ca7479669d66212228b072eb97ebc44caa3b213d2bfffed0972ccf9569",
+          "bytes": 743898,
+          "log": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/logs/outer-loop-1-candidate.log"
+        }
+      },
+      "fullHtmlByteIdentical": true
+    },
+    {
+      "input": "outer-loop-2.json",
+      "source": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260929/research-rendering/outer-loop-2.json",
+      "inputSha256": "049ebb3a781a300c168b993e313264b847d31c47d1c1c8a199a69ae0d1b63a82",
+      "schemaVersion": 2,
+      "transitionCount": 2,
+      "stateColumns": [
+        0
+      ],
+      "runs": {
+        "base": {
+          "exitCode": 0,
+          "html": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/base/outer-loop-2.html",
+          "htmlSha256": "f7325167bc6e15f8cb7aa80007fc47c935f6f4ae05eda2f2f0a92592ff19fd08",
+          "bytes": 744553,
+          "log": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/logs/outer-loop-2-base.log"
+        },
+        "candidate": {
+          "exitCode": 0,
+          "html": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/candidate/outer-loop-2.html",
+          "htmlSha256": "f7325167bc6e15f8cb7aa80007fc47c935f6f4ae05eda2f2f0a92592ff19fd08",
+          "bytes": 744553,
+          "log": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/logs/outer-loop-2-candidate.log"
+        }
+      },
+      "fullHtmlByteIdentical": true
+    },
+    {
+      "input": "outer-loop-3.json",
+      "source": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260929/research-rendering/outer-loop-3.json",
+      "inputSha256": "a18caee2508bdd0bcac27877d46dd13df918ceb41aa5eff4d2259207b2282245",
+      "schemaVersion": 2,
+      "transitionCount": 3,
+      "stateColumns": [
+        0
+      ],
+      "runs": {
+        "base": {
+          "exitCode": 0,
+          "html": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/base/outer-loop-3.html",
+          "htmlSha256": "ad34be246e1ad42655690346341e404db94003567c2ed7c6a0c97f6155a85a45",
+          "bytes": 745089,
+          "log": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/logs/outer-loop-3-base.log"
+        },
+        "candidate": {
+          "exitCode": 0,
+          "html": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/candidate/outer-loop-3.html",
+          "htmlSha256": "ad34be246e1ad42655690346341e404db94003567c2ed7c6a0c97f6155a85a45",
+          "bytes": 745089,
+          "log": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/logs/outer-loop-3-candidate.log"
+        }
+      },
+      "fullHtmlByteIdentical": true
+    },
+    {
+      "input": "outer-loop-4.json",
+      "source": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260929/research-rendering/outer-loop-4.json",
+      "inputSha256": "7bb3740a247f5e28d63316de09e701328b18cde368b1a722ec917fe9e03e74b2",
+      "schemaVersion": 2,
+      "transitionCount": 4,
+      "stateColumns": [
+        0
+      ],
+      "runs": {
+        "base": {
+          "exitCode": 0,
+          "html": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/base/outer-loop-4.html",
+          "htmlSha256": "fd1ee91ac9db1a05a24e73a671d25612dfbdcbb4a2c8923a41eefe0268388d73",
+          "bytes": 745615,
+          "log": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/logs/outer-loop-4-base.log"
+        },
+        "candidate": {
+          "exitCode": 0,
+          "html": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/candidate/outer-loop-4.html",
+          "htmlSha256": "fd1ee91ac9db1a05a24e73a671d25612dfbdcbb4a2c8923a41eefe0268388d73",
+          "bytes": 745615,
+          "log": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/logs/outer-loop-4-candidate.log"
+        }
+      },
+      "fullHtmlByteIdentical": true
+    },
+    {
+      "input": "outer-loop-col-1.json",
+      "source": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260929/research-rendering/outer-loop-col-1.json",
+      "inputSha256": "deeef2cac85814c89e5e780010a15aad43ac888ae1dbe753dc6318d52aab8f9b",
+      "schemaVersion": 2,
+      "transitionCount": 6,
+      "stateColumns": [
+        1
+      ],
+      "runs": {
+        "base": {
+          "exitCode": 0,
+          "html": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/base/outer-loop-col-1.html",
+          "htmlSha256": "2fdbf1aba86fd36264b6b07a13c83e2bfd3cc145686ccea76fda2a4f8c06385b",
+          "bytes": 747062,
+          "log": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/logs/outer-loop-col-1-base.log"
+        },
+        "candidate": {
+          "exitCode": 0,
+          "html": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/candidate/outer-loop-col-1.html",
+          "htmlSha256": "2fdbf1aba86fd36264b6b07a13c83e2bfd3cc145686ccea76fda2a4f8c06385b",
+          "bytes": 747062,
+          "log": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/logs/outer-loop-col-1-candidate.log"
+        }
+      },
+      "fullHtmlByteIdentical": true
+    },
+    {
+      "input": "outer-loop-col-4.json",
+      "source": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260929/research-rendering/outer-loop-col-4.json",
+      "inputSha256": "41f816a51604b931b2a89765c3234878bbe8e1ab771448d52d8bbf4850115bc1",
+      "schemaVersion": 2,
+      "transitionCount": 6,
+      "stateColumns": [
+        4
+      ],
+      "runs": {
+        "base": {
+          "exitCode": 0,
+          "html": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/base/outer-loop-col-4.html",
+          "htmlSha256": "dc9792b8a8a01dcaaddbcf763e9a60637386bc01eaf670b88bfcd21b85fae340",
+          "bytes": 747063,
+          "log": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/logs/outer-loop-col-4-base.log"
+        },
+        "candidate": {
+          "exitCode": 0,
+          "html": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/candidate/outer-loop-col-4.html",
+          "htmlSha256": "dc9792b8a8a01dcaaddbcf763e9a60637386bc01eaf670b88bfcd21b85fae340",
+          "bytes": 747063,
+          "log": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/logs/outer-loop-col-4-candidate.log"
+        }
+      },
+      "fullHtmlByteIdentical": true
+    }
+  ],
+  "scope": "Fixed public render inputs; byte equality establishes unchanged generated HTML for these eight cases, not global visual acceptance."
+}

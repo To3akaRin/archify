@@ -1,0 +1,28 @@
+✖ 同组不同跨度保留原本已避开宽节点及邻列的换侧候选 (221.738417ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 268.144917
+
+✖ failing tests:
+
+test at archify/test/lifecycle-route-bounds.test.mjs:291:1
+✖ 同组不同跨度保留原本已避开宽节点及邻列的换侧候选 (221.738417ms)
+  AssertionError [ERR_ASSERTION]: t4: x=2, halo=2.55, canvas=640
+      at contained (file:///Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-lifecycle-route-bounds/archify/test/lifecycle-route-bounds.test.mjs:60:14)
+      at TestContext.<anonymous> (file:///Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-lifecycle-route-bounds/archify/test/lifecycle-route-bounds.test.mjs:301:3)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1325:25)
+      at Test.start (node:internal/test_runner/test:1191:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:385:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

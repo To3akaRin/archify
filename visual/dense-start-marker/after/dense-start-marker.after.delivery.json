@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "6a0b1157-9807-4330-8efd-57ff89f7f24a",
+  "status": "current",
+  "command": "deliver",
+  "type": "lifecycle",
+  "input": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/inputs/dense-start-marker.lifecycle.json",
+  "output": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/dense-start-marker/after/dense-start-marker.after.html",
+  "specification": {
+    "sha256": "78b75c1858e1a8e39c85100993101ee8cb4e1a99dae1276eaee4cef3aadcd11a",
+    "bytes": 1726
+  },
+  "artifact": {
+    "sha256": "4e5fc9112c3942d62f6d5931615eb702b4b023d6809e9d978b7f194b119e98b9",
+    "bytes": 754292
+  }
+}

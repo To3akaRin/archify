@@ -1,0 +1,118 @@
+{
+  "schema_version": 2,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "Marker collision",
+    "output": "marker.html",
+    "quality_profile": "showcase"
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "main"
+    },
+    {
+      "id": "wait",
+      "label": "wait"
+    },
+    {
+      "id": "retry",
+      "label": "retry"
+    },
+    {
+      "id": "terminal",
+      "label": "terminal"
+    }
+  ],
+  "states": [
+    {
+      "id": "a",
+      "label": "A",
+      "type": "active",
+      "lane": "main",
+      "col": 0
+    },
+    {
+      "id": "b",
+      "label": "B",
+      "type": "active",
+      "lane": "wait",
+      "col": 0
+    },
+    {
+      "id": "c",
+      "label": "C",
+      "type": "active",
+      "lane": "retry",
+      "col": 0
+    },
+    {
+      "id": "marker",
+      "label": "M",
+      "type": "start",
+      "lane": "wait",
+      "col": 1,
+      "width": 48
+    },
+    {
+      "id": "wide",
+      "label": "Wide",
+      "type": "active",
+      "lane": "terminal",
+      "col": 1,
+      "width": 160
+    }
+  ],
+  "transitions": [
+    {
+      "id": "t0",
+      "from": "a",
+      "to": "c"
+    },
+    {
+      "id": "t1",
+      "from": "c",
+      "to": "a"
+    },
+    {
+      "id": "t2",
+      "from": "a",
+      "to": "c"
+    },
+    {
+      "id": "t3",
+      "from": "c",
+      "to": "a"
+    },
+    {
+      "id": "t4",
+      "from": "a",
+      "to": "c"
+    },
+    {
+      "id": "t5",
+      "from": "c",
+      "to": "a"
+    },
+    {
+      "id": "t6",
+      "from": "a",
+      "to": "c"
+    },
+    {
+      "id": "t7",
+      "from": "c",
+      "to": "a"
+    },
+    {
+      "id": "t8",
+      "from": "a",
+      "to": "c"
+    },
+    {
+      "id": "t9",
+      "from": "c",
+      "to": "a"
+    }
+  ]
+}

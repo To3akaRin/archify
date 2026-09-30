@@ -1,0 +1,111 @@
+{
+  "schema_version": 2,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "Wide intermediate state: right alternate",
+    "output": "wide-middle-right.html",
+    "quality_profile": "showcase"
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "main"
+    },
+    {
+      "id": "wait",
+      "label": "wait"
+    },
+    {
+      "id": "retry",
+      "label": "retry"
+    },
+    {
+      "id": "terminal",
+      "label": "terminal"
+    }
+  ],
+  "states": [
+    {
+      "id": "a",
+      "type": "active",
+      "label": "a",
+      "lane": "main",
+      "col": 0
+    },
+    {
+      "id": "b",
+      "type": "active",
+      "label": "b",
+      "lane": "wait",
+      "col": 0,
+      "width": 240
+    },
+    {
+      "id": "c",
+      "type": "active",
+      "label": "c",
+      "lane": "retry",
+      "col": 0
+    },
+    {
+      "id": "outside",
+      "type": "active",
+      "label": "Outside",
+      "lane": "terminal",
+      "col": 1,
+      "width": 300
+    }
+  ],
+  "transitions": [
+    {
+      "id": "t0",
+      "from": "a",
+      "to": "c"
+    },
+    {
+      "id": "t1",
+      "from": "c",
+      "to": "a"
+    },
+    {
+      "id": "t2",
+      "from": "a",
+      "to": "c"
+    },
+    {
+      "id": "t3",
+      "from": "c",
+      "to": "a"
+    },
+    {
+      "id": "t4",
+      "from": "a",
+      "to": "c"
+    },
+    {
+      "id": "t5",
+      "from": "c",
+      "to": "a"
+    },
+    {
+      "id": "t6",
+      "from": "a",
+      "to": "c"
+    },
+    {
+      "id": "t7",
+      "from": "c",
+      "to": "a"
+    },
+    {
+      "id": "t8",
+      "from": "a",
+      "to": "c"
+    },
+    {
+      "id": "t9",
+      "from": "c",
+      "to": "a"
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "ffb21503-368b-4137-a8a4-e18fdd17c71b",
+  "status": "current",
+  "command": "deliver",
+  "type": "lifecycle",
+  "input": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/inputs/extra-1-wide-middle-right-lifecycle.lifecycle.json",
+  "output": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/extra-1-wide-middle-right-lifecycle/before/extra-1-wide-middle-right-lifecycle.before.html",
+  "specification": {
+    "sha256": "3da3fada9669b6430d69ab2d34c938a0a4583dff270fd8a7405e42627b5cc3a7",
+    "bytes": 1654
+  },
+  "artifact": {
+    "sha256": "bef3d6c279a7d54fd755025ade73fc906df7f50dd1d3a43d644848215e065e61",
+    "bytes": 752187
+  }
+}

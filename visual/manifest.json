@@ -1,0 +1,389 @@
+{
+  "createdAt": "2026-09-30T08:40:50.984Z",
+  "side": "both",
+  "base": {
+    "directory": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-batch-integration",
+    "sha": "6bc47e51fc95c153a71e36df411546ef60d3908d"
+  },
+  "candidate": {
+    "directory": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-lifecycle-route-bounds",
+    "sha": "c45ea534a405303890f4795e03412cffb849b1a8"
+  },
+  "runtime": {
+    "executable": "/Users/huangjing/.nvm/versions/node/v22.23.1/bin/node",
+    "node": "22.23.1",
+    "zlib": "1.3.1-e00f703",
+    "chrome": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+    "chromeVersion": "Google Chrome 154.0.8037.59"
+  },
+  "settings": {
+    "primaryViewport": [
+      1440,
+      900
+    ],
+    "supplementalViewport": [
+      2048,
+      1320
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "deviceScaleFactor": 1,
+    "browserZoom": "100%",
+    "detailLevel": "read",
+    "motion": "still",
+    "pageState": "fresh navigation; no focus, hover, search or zoom interaction",
+    "notes": "visual-check 采用全新临时 Chrome profile，等待字体与布局稳定；不改写输入或输出 HTML"
+  },
+  "schemaChecks": {
+    "before": [
+      {
+        "id": "minimal-six-loops",
+        "sha256": "195f5cd6b68703f4216518043b44888d1faffe4f4c1c27ae450ce73e15e3dde8",
+        "schema": "pass",
+        "states": 4,
+        "transitions": 6,
+        "startMarkers": 0,
+        "labelCoverage": {
+          "laneTitles": 4,
+          "nodeLabels": 4,
+          "transitionLabels": 0
+        }
+      },
+      {
+        "id": "dense-start-marker",
+        "sha256": "78b75c1858e1a8e39c85100993101ee8cb4e1a99dae1276eaee4cef3aadcd11a",
+        "schema": "pass",
+        "states": 5,
+        "transitions": 10,
+        "startMarkers": 1,
+        "labelCoverage": {
+          "laneTitles": 4,
+          "nodeLabels": 5,
+          "transitionLabels": 0
+        }
+      },
+      {
+        "id": "extra-1-wide-middle-right-lifecycle",
+        "sha256": "3da3fada9669b6430d69ab2d34c938a0a4583dff270fd8a7405e42627b5cc3a7",
+        "schema": "pass",
+        "states": 4,
+        "transitions": 10,
+        "startMarkers": 0,
+        "labelCoverage": {
+          "laneTitles": 4,
+          "nodeLabels": 4,
+          "transitionLabels": 0
+        }
+      }
+    ],
+    "after": [
+      {
+        "id": "minimal-six-loops",
+        "sha256": "195f5cd6b68703f4216518043b44888d1faffe4f4c1c27ae450ce73e15e3dde8",
+        "schema": "pass",
+        "states": 4,
+        "transitions": 6,
+        "startMarkers": 0,
+        "labelCoverage": {
+          "laneTitles": 4,
+          "nodeLabels": 4,
+          "transitionLabels": 0
+        }
+      },
+      {
+        "id": "dense-start-marker",
+        "sha256": "78b75c1858e1a8e39c85100993101ee8cb4e1a99dae1276eaee4cef3aadcd11a",
+        "schema": "pass",
+        "states": 5,
+        "transitions": 10,
+        "startMarkers": 1,
+        "labelCoverage": {
+          "laneTitles": 4,
+          "nodeLabels": 5,
+          "transitionLabels": 0
+        }
+      },
+      {
+        "id": "extra-1-wide-middle-right-lifecycle",
+        "sha256": "3da3fada9669b6430d69ab2d34c938a0a4583dff270fd8a7405e42627b5cc3a7",
+        "schema": "pass",
+        "states": 4,
+        "transitions": 10,
+        "startMarkers": 0,
+        "labelCoverage": {
+          "laneTitles": 4,
+          "nodeLabels": 4,
+          "transitionLabels": 0
+        }
+      }
+    ]
+  },
+  "cases": [
+    {
+      "id": "minimal-six-loops",
+      "input": "inputs/minimal-six-loops.lifecycle.json",
+      "source": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/inputs/minimal-six-loops.lifecycle.json",
+      "sha256": "195f5cd6b68703f4216518043b44888d1faffe4f4c1c27ae450ce73e15e3dde8",
+      "description": "四泳道、四状态、六条返回关系，原始负坐标复现"
+    },
+    {
+      "id": "dense-start-marker",
+      "input": "inputs/dense-start-marker.lifecycle.json",
+      "source": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/inputs/dense-start-marker.lifecycle.json",
+      "sha256": "78b75c1858e1a8e39c85100993101ee8cb4e1a99dae1276eaee4cef3aadcd11a",
+      "description": "十条返回关系与邻列初始圆点、箭线，检查紧凑换侧与标记避让"
+    },
+    {
+      "id": "extra-1-wide-middle-right-lifecycle",
+      "input": "inputs/extra-1-wide-middle-right-lifecycle.lifecycle.json",
+      "source": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/inputs/wide-middle-right.lifecycle.json",
+      "sha256": "3da3fada9669b6430d69ab2d34c938a0a4583dff270fd8a7405e42627b5cc3a7",
+      "description": "修订时新增的固定回归输入"
+    }
+  ],
+  "stages": [
+    {
+      "case": "minimal-six-loops",
+      "side": "before",
+      "stage": "deliver",
+      "command": [
+        "/Users/huangjing/.nvm/versions/node/v22.23.1/bin/node",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-batch-integration/archify/bin/archify.mjs",
+        "deliver",
+        "lifecycle",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/inputs/minimal-six-loops.lifecycle.json",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/minimal-six-loops/before/minimal-six-loops.before.html",
+        "--quality",
+        "showcase",
+        "--json"
+      ],
+      "cwd": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-batch-integration",
+      "exitCode": 0,
+      "signal": null,
+      "error": null
+    },
+    {
+      "case": "minimal-six-loops",
+      "side": "before",
+      "stage": "visual-check",
+      "command": [
+        "/Users/huangjing/.nvm/versions/node/v22.23.1/bin/node",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-batch-integration/archify/bin/archify.mjs",
+        "visual-check",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/minimal-six-loops/before/minimal-six-loops.before.html",
+        "--summary",
+        "--require-provenance",
+        "--out-dir",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/minimal-six-loops/before/screenshots"
+      ],
+      "cwd": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-batch-integration",
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "artifactSha256": "433e246865aab406cc18b427d87ad42107b8bc16c0aaa0a6df47dff577cbf4a3"
+    },
+    {
+      "case": "minimal-six-loops",
+      "side": "after",
+      "stage": "deliver",
+      "command": [
+        "/Users/huangjing/.nvm/versions/node/v22.23.1/bin/node",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-lifecycle-route-bounds/archify/bin/archify.mjs",
+        "deliver",
+        "lifecycle",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/inputs/minimal-six-loops.lifecycle.json",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/minimal-six-loops/after/minimal-six-loops.after.html",
+        "--quality",
+        "showcase",
+        "--json"
+      ],
+      "cwd": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-lifecycle-route-bounds",
+      "exitCode": 0,
+      "signal": null,
+      "error": null
+    },
+    {
+      "case": "minimal-six-loops",
+      "side": "after",
+      "stage": "visual-check",
+      "command": [
+        "/Users/huangjing/.nvm/versions/node/v22.23.1/bin/node",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-lifecycle-route-bounds/archify/bin/archify.mjs",
+        "visual-check",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/minimal-six-loops/after/minimal-six-loops.after.html",
+        "--summary",
+        "--require-provenance",
+        "--out-dir",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/minimal-six-loops/after/screenshots"
+      ],
+      "cwd": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-lifecycle-route-bounds",
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "artifactSha256": "b3591be5effca13916844ba99351d3073ecef41e3116916e6560ad09cb3300b7"
+    },
+    {
+      "case": "dense-start-marker",
+      "side": "before",
+      "stage": "deliver",
+      "command": [
+        "/Users/huangjing/.nvm/versions/node/v22.23.1/bin/node",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-batch-integration/archify/bin/archify.mjs",
+        "deliver",
+        "lifecycle",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/inputs/dense-start-marker.lifecycle.json",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/dense-start-marker/before/dense-start-marker.before.html",
+        "--quality",
+        "showcase",
+        "--json"
+      ],
+      "cwd": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-batch-integration",
+      "exitCode": 0,
+      "signal": null,
+      "error": null
+    },
+    {
+      "case": "dense-start-marker",
+      "side": "before",
+      "stage": "visual-check",
+      "command": [
+        "/Users/huangjing/.nvm/versions/node/v22.23.1/bin/node",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-batch-integration/archify/bin/archify.mjs",
+        "visual-check",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/dense-start-marker/before/dense-start-marker.before.html",
+        "--summary",
+        "--require-provenance",
+        "--out-dir",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/dense-start-marker/before/screenshots"
+      ],
+      "cwd": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-batch-integration",
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "artifactSha256": "90b3114353b7a363e7548cc78e7c1f0cc3e11766fd198dae1804c5f8064e4cab"
+    },
+    {
+      "case": "dense-start-marker",
+      "side": "after",
+      "stage": "deliver",
+      "command": [
+        "/Users/huangjing/.nvm/versions/node/v22.23.1/bin/node",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-lifecycle-route-bounds/archify/bin/archify.mjs",
+        "deliver",
+        "lifecycle",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/inputs/dense-start-marker.lifecycle.json",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/dense-start-marker/after/dense-start-marker.after.html",
+        "--quality",
+        "showcase",
+        "--json"
+      ],
+      "cwd": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-lifecycle-route-bounds",
+      "exitCode": 0,
+      "signal": null,
+      "error": null
+    },
+    {
+      "case": "dense-start-marker",
+      "side": "after",
+      "stage": "visual-check",
+      "command": [
+        "/Users/huangjing/.nvm/versions/node/v22.23.1/bin/node",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-lifecycle-route-bounds/archify/bin/archify.mjs",
+        "visual-check",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/dense-start-marker/after/dense-start-marker.after.html",
+        "--summary",
+        "--require-provenance",
+        "--out-dir",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/dense-start-marker/after/screenshots"
+      ],
+      "cwd": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-lifecycle-route-bounds",
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "artifactSha256": "4e5fc9112c3942d62f6d5931615eb702b4b023d6809e9d978b7f194b119e98b9"
+    },
+    {
+      "case": "extra-1-wide-middle-right-lifecycle",
+      "side": "before",
+      "stage": "deliver",
+      "command": [
+        "/Users/huangjing/.nvm/versions/node/v22.23.1/bin/node",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-batch-integration/archify/bin/archify.mjs",
+        "deliver",
+        "lifecycle",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/inputs/extra-1-wide-middle-right-lifecycle.lifecycle.json",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/extra-1-wide-middle-right-lifecycle/before/extra-1-wide-middle-right-lifecycle.before.html",
+        "--quality",
+        "showcase",
+        "--json"
+      ],
+      "cwd": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-batch-integration",
+      "exitCode": 0,
+      "signal": null,
+      "error": null
+    },
+    {
+      "case": "extra-1-wide-middle-right-lifecycle",
+      "side": "before",
+      "stage": "visual-check",
+      "command": [
+        "/Users/huangjing/.nvm/versions/node/v22.23.1/bin/node",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-batch-integration/archify/bin/archify.mjs",
+        "visual-check",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/extra-1-wide-middle-right-lifecycle/before/extra-1-wide-middle-right-lifecycle.before.html",
+        "--summary",
+        "--require-provenance",
+        "--out-dir",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/extra-1-wide-middle-right-lifecycle/before/screenshots"
+      ],
+      "cwd": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-batch-integration",
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "artifactSha256": "bef3d6c279a7d54fd755025ade73fc906df7f50dd1d3a43d644848215e065e61"
+    },
+    {
+      "case": "extra-1-wide-middle-right-lifecycle",
+      "side": "after",
+      "stage": "deliver",
+      "command": [
+        "/Users/huangjing/.nvm/versions/node/v22.23.1/bin/node",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-lifecycle-route-bounds/archify/bin/archify.mjs",
+        "deliver",
+        "lifecycle",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/inputs/extra-1-wide-middle-right-lifecycle.lifecycle.json",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/extra-1-wide-middle-right-lifecycle/after/extra-1-wide-middle-right-lifecycle.after.html",
+        "--quality",
+        "showcase",
+        "--json"
+      ],
+      "cwd": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-lifecycle-route-bounds",
+      "exitCode": 0,
+      "signal": null,
+      "error": null
+    },
+    {
+      "case": "extra-1-wide-middle-right-lifecycle",
+      "side": "after",
+      "stage": "visual-check",
+      "command": [
+        "/Users/huangjing/.nvm/versions/node/v22.23.1/bin/node",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-lifecycle-route-bounds/archify/bin/archify.mjs",
+        "visual-check",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/extra-1-wide-middle-right-lifecycle/after/extra-1-wide-middle-right-lifecycle.after.html",
+        "--summary",
+        "--require-provenance",
+        "--out-dir",
+        "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/evidence/final/extra-1-wide-middle-right-lifecycle/after/screenshots"
+      ],
+      "cwd": "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-lifecycle-route-bounds",
+      "exitCode": 0,
+      "signal": null,
+      "error": null,
+      "artifactSha256": "87ccbf9c71a6dd4f21ca97078428a719b16f4108942cc136051c3388caea0632"
+    }
+  ],
+  "perceptualReview": "pending"
+}
