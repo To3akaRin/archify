@@ -238,6 +238,7 @@ function measureState(state) {
 }
 
 const states = new Map(asArray(lifecycle.states).map((state) => [state.id, measureState(state)]));
+const laneLabels = new Map(asArray(lifecycle.lanes).map((lane) => [lane.id, lane.label]));
 const plannedTransitions = asArray(lifecycle.transitions).filter(plannerRouted);
 const v2Rows = laneRowOrder();
 const v2RowOf = (state) => (v2Rows.includes(state.lane) ? v2Rows.indexOf(state.lane) : undefined);
@@ -251,6 +252,7 @@ if (isV2) {
   // then open every gap to fit them before the final routing pass.
   const probe = createLifecycleGridRouter(states, plannedTransitions, {
     rowOf: v2RowOf, columnXs: v2ColumnCenters, canvasWidth: v2CanvasWidth,
+    bandTitles: bandGeometry(),
   });
   // Compatible pins keep the grid layout. A conflicting pin sends the whole
   // scene to the side-aware planner so all edges still share port spreading
@@ -269,7 +271,6 @@ if (isV2) {
   });
   for (const state of asArray(lifecycle.states)) states.set(state.id, measureState(state));
 }
-const laneLabels = new Map(asArray(lifecycle.lanes).map((lane) => [lane.id, lane.label]));
 const authoredOutgoing = new Set(asArray(lifecycle.transitions).map((transition) => transition.from));
 
 // A state with no authored outgoing transition is terminal in the UML sense.
@@ -627,6 +628,7 @@ const planner = useGridRouter ? createLifecycleGridRouter(states, plannedTransit
   rowOf: v2RowOf,
   columnXs: v2ColumnCenters,
   canvasWidth: v2CanvasWidth,
+  bandTitles: bandGeometry(),
 }) : createRouter(states, plannedTransitions, {
   labelRectFor: (transition, points, { routes, labels }) => ((transition.label || transition.note) ? reservedLabelRect({
     label: { relation: transition, label: transition.label || transition.note, ...transitionLabelBoxAt(transition, labelPoint(transition, points)) },

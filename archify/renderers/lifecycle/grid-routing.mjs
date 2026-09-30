@@ -35,7 +35,7 @@ function permutations(items) {
     .map((rest) => [item, ...rest]));
 }
 
-export function createLifecycleGridRouter(states, transitions, { rowOf, columnXs, canvasWidth }) {
+export function createLifecycleGridRouter(states, transitions, { rowOf, columnXs, canvasWidth, bandTitles = [] }) {
   const byRow = new Map();
   for (const state of states.values()) {
     const row = rowOf(state);
@@ -174,9 +174,11 @@ export function createLifecycleGridRouter(states, transitions, { rowOf, columnXs
   // 只修复超出画布的外绕轨道。端点、节点和作者坐标保持不变；
   // 预算包括 crossover halo，轨道之间至少留 1px，不能靠重叠消除越界。
   const loopPadding = transition => ((transition.width || (transition.variant === 'emphasis' ? 1.6 : 1.1)) + 4) / 2;
+  // 与渲染器共用标题几何，只在越界轨道重新拟合时保留左侧标题和 2px 间距。
+  const leftGutter = Math.max(0, ...bandTitles.map(title => title.x + title.width + 2));
   function fitOuterLoops(entries, side, edge, compact = false) {
     const padding = Math.max(...entries.map(([transition]) => loopPadding(transition)));
-    const space = (side === 'left' ? edge : canvasWidth - edge) - padding;
+    const space = (side === 'left' ? edge - leftGutter : canvasWidth - edge) - padding;
     const preferredSpacing = compact ? padding * 2 + 1 : Math.max(CORRIDOR_SPACING, padding * 2 + 1);
     const spacing = entries.length > 1 ? Math.min(preferredSpacing, (space - 8) / (entries.length - 1)) : 0;
     if (space < 8 || (entries.length > 1 && spacing < padding * 2 + 1)) return null;
@@ -199,9 +201,10 @@ export function createLifecycleGridRouter(states, transitions, { rowOf, columnXs
     // 用完整端口高度检查候选，避免重新分配端口后才撞到相邻状态。
     const corridors = [horizontal(plan.from), horizontal(plan.to),
       bounds(x, x, Math.min(plan.from.y, plan.to.y), Math.max(plan.from.y + plan.from.height, plan.to.y + plan.to.height))];
-    const clear = obstacle => corridors.every(corridor => !rectsOverlap(corridor, obstacle, Math.max(6, padding + 2)));
+    const clear = (obstacle, clearance = Math.max(6, padding + 2)) => corridors.every(corridor => !rectsOverlap(corridor, obstacle, clearance));
     return allStates.every(state => state === plan.from || state === plan.to || clear(state))
-      && initialMarkers.every(clear);
+      && initialMarkers.every(marker => clear(marker))
+      && bandTitles.every(title => clear(title, padding + 2));
   }
 
   if (Number.isFinite(canvasWidth)) {
@@ -224,18 +227,27 @@ export function createLifecycleGridRouter(states, transitions, { rowOf, columnXs
       if (!positions && entries.every(([transition]) => ['fromSide', 'toSide']
         .every(key => !transition[key] || transition[key] === 'auto'))) {
         targetSide = opposite[side];
+        // 换侧边界覆盖本组所跨行中同列的完整状态，避免端点较窄时
+        // 两个候选都落进中间宽节点；其他列仍由完整走廊检查排除。
+        const envelope = allStates.filter(state => entries.some(([, plan]) =>
+          Math.abs(state.cx - plan.from.cx) < 1
+          && rowOf(state) >= Math.min(rowOf(plan.from), rowOf(plan.to))
+          && rowOf(state) <= Math.max(rowOf(plan.from), rowOf(plan.to))));
         const endpoints = entries.flatMap(([, plan]) => [plan.from, plan.to]);
-        const edge = targetSide === 'left' ? Math.min(...endpoints.map(state => state.x))
-          : Math.max(...endpoints.map(state => state.x + state.width));
-        // 仅两个确定性候选：常规间距与仍保留 halo 间 1px 的
-        // 紧凑轨道。检查装饰和节点，不靠回退负坐标避开障碍。
-        for (const compact of compactAlternates ? [true, false] : [false, true]) {
-          const candidate = fitOuterLoops(entries, targetSide, edge, compact);
-          if (candidate && entries.every(([transition, plan], index) =>
-            clearAlternateLoop(plan, targetSide, candidate[index], loopPadding(transition)))) {
-            positions = candidate;
-            break;
+        const edges = [...new Set([endpoints, envelope].map(group => targetSide === 'left'
+          ? Math.min(...group.map(state => state.x)) : Math.max(...group.map(state => state.x + state.width))))];
+        // 先保留端点边界已经可用的短长嵌套分配，再扩大到中间状态；
+        // 每个边界仅试常规和紧凑间距，所有候选都检查节点、标记和标题。
+        for (const edge of edges) {
+          for (const compact of compactAlternates ? [true, false] : [false, true]) {
+            const candidate = fitOuterLoops(entries, targetSide, edge, compact);
+            if (candidate && entries.every(([transition, plan], index) =>
+              clearAlternateLoop(plan, targetSide, candidate[index], loopPadding(transition)))) {
+              positions = candidate;
+              break;
+            }
           }
+          if (positions) break;
         }
       }
       if (!positions) continue;

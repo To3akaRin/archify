@@ -81,7 +81,6 @@ for (const options of [
   { count: 6 },
   { count: 6, quality: 'standard' },
   { count: 6, viewBox: [1000, 800] },
-  { count: 6, pinned: true },
   { count: 6, width: 4 },
   { count: 6, width: 6 },
   { count: 8 },
@@ -97,6 +96,39 @@ for (const options of [
     assert.deepEqual(result.viewBox, options.viewBox ? [0, 0, ...options.viewBox] : [0, 0, options.right ? 1076 : 640, 768]);
   });
 }
+
+test('越界回线重排后不进入泳道标题占用的左侧区域', t => {
+  const doc = document();
+  const result = deliver(t, doc);
+  contained(result, doc);
+  const titles = [...result.svg.matchAll(/<text x="([\d.]+)" y="([\d.]+)"[^>]*font-size="([\d.]+)"[^>]*writing-mode="vertical-rl"[^>]*>([^<]+)<\/text>/g)];
+  assert.equal(titles.length, doc.lanes.length);
+  for (const route of result.routes) {
+    const inset = (route.stroke + 4) / 2;
+    for (const [, x, y, font, label] of titles) {
+      // 读取最终 SVG 标题位置，以现有 14px 标题宽度检查可见笔画和 halo。
+      const title = { left: Number(x) - Number(font) * 0.7, right: Number(x) + Number(font) * 0.7,
+        top: Number(y) - label.length * 3.1, bottom: Number(y) + label.length * 3.1 };
+      for (let index = 1; index < route.points.length; index += 1) {
+        const a = route.points[index - 1], b = route.points[index];
+        assert.ok(Math.max(a[0], b[0]) + inset < title.left || Math.min(a[0], b[0]) - inset > title.right
+          || Math.max(a[1], b[1]) + inset < title.top || Math.min(a[1], b[1]) - inset > title.bottom,
+        `${route.id} 与泳道标题 ${label} 重叠`);
+      }
+    }
+  }
+});
+
+test('标题与固定侧边不能同时容纳六条轨道时保留作者端口', t => {
+  const doc = document({ pinned: true });
+  const result = deliver(t, doc);
+  assert.equal(result.routes.length, doc.transitions.length);
+  for (const route of result.routes) {
+    const relation = doc.transitions.find(transition => transition.id === route.id);
+    assert.equal(route.points[0][0], result.nodes[relation.from].x);
+    assert.equal(route.points.at(-1)[0], result.nodes[relation.to].x);
+  }
+});
 
 for (let count = 1; count <= 5; count += 1) {
   test(`v2 少量外绕关系控制组: ${count}`, t => {
@@ -200,4 +232,73 @@ test('左右两组都需要换到内侧时，不形成新的共享水平走廊',
   assert.ok(Math.max(...left.map(route => route.points[1][0] + (route.stroke + 4) / 2))
     < Math.min(...right.map(route => route.points[1][0] - (route.stroke + 4) / 2)),
   '两组相向的水平线段及 halo 之间必须留有间隔');
+});
+
+function wideMiddleDocument(side) {
+  const doc = document({ count: 10, col: side === 'left' ? 1 : 0,
+    ...(side === 'left' ? { viewBox: [532, 800] } : {}) });
+  doc.states = doc.states.slice(0, 3);
+  doc.states[1].width = 240;
+  // 跨度外的另一列仍决定最外列，但不能扩大本组的换侧包络。
+  doc.states.push({ id: 'outside', type: 'active', label: 'Outside', lane: 'terminal',
+    col: side === 'left' ? 0 : 1, width: side === 'left' ? 140 : 300 });
+  doc.transitions = doc.transitions.map((transition, index) => ({ ...transition,
+    from: index % 2 ? 'c' : 'a', to: index % 2 ? 'a' : 'c' }));
+  return doc;
+}
+
+for (const side of ['right', 'left']) {
+  test(`宽中间状态仍有可用空间时，外绕关系可换到${side}侧`, t => {
+    const doc = wideMiddleDocument(side);
+    const result = deliver(t, doc);
+    contained(result, doc);
+    const obstacle = result.nodes.b;
+    for (const route of result.routes) {
+      const inset = (route.stroke + 4) / 2;
+      assert.ok(side === 'left' ? route.points[1][0] + inset < obstacle.x
+        : route.points[1][0] - inset > obstacle.x + obstacle.width,
+      `${route.id} 必须经过宽中间状态外侧的可用走廊`);
+    }
+    assert.equal(obstacle.width, 240, '不能靠缩小中间状态释放空间');
+  });
+
+  test(`宽中间状态不能覆盖作者固定的${side === 'left' ? 'right' : 'left'}侧端口`, t => {
+    const doc = wideMiddleDocument(side);
+    const pinned = side === 'left' ? 'right' : 'left';
+    for (const transition of doc.transitions) transition.fromSide = transition.toSide = pinned;
+    const result = deliver(t, doc);
+    assert.equal(result.routes.length, doc.transitions.length);
+    for (const route of result.routes) {
+      const relation = doc.transitions.find(transition => transition.id === route.id);
+      for (const [point, node] of [[route.points[0], result.nodes[relation.from]], [route.points.at(-1), result.nodes[relation.to]]]) {
+        assert.equal(point[0], pinned === 'left' ? node.x : node.x + node.width);
+      }
+    }
+    // 原侧空间不足仍保留显式约束；不把交付成功误当作几何已完整入画。
+    assert.ok(result.routes.some(route => route.points.some(([x]) => x < 0 || x > result.viewBox[2])));
+  });
+}
+
+test('同列跨度外的宽状态不挤占换侧走廊', t => {
+  const doc = wideMiddleDocument('right');
+  Object.assign(doc.states.at(-1), { col: 0, width: 900 });
+  const result = deliver(t, doc);
+  contained(result, doc);
+  assert.ok(result.routes.every(route => route.points[1][0] > result.nodes.b.x + result.nodes.b.width
+    && route.points[1][0] < result.nodes.outside.x + result.nodes.outside.width));
+});
+
+test('同组不同跨度保留原本已避开宽节点及邻列的换侧候选', t => {
+  const doc = document({ count: 10 });
+  doc.states.push(
+    { id: 'wide', type: 'active', label: 'Wide', lane: 'retry', col: 0, width: 240, yOffset: 96 },
+    { id: 'neighbor', type: 'active', label: 'N', lane: 'retry', col: 1, yOffset: 96 },
+  );
+  doc.transitions = doc.transitions.map((transition, index) => ({ ...transition,
+    from: index % 2 ? (index < 5 ? 'c' : 'd') : 'a',
+    to: index % 2 ? 'a' : (index < 5 ? 'c' : 'd') }));
+  const result = deliver(t, doc);
+  contained(result, doc);
+  assert.deepEqual(result.routes.map(route => route.points[1][0]),
+    Array.from({ length: 10 }, (_, index) => 268 + index * 10), '已无碰撞的短长嵌套分配保持原值');
 });
