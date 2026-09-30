@@ -1,0 +1,79 @@
+{
+  "schema_version": 2,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "Retry lifecycle",
+    "output": "retry.html",
+    "quality_profile": "showcase"
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "Main"
+    },
+    {
+      "id": "wait",
+      "label": "Wait"
+    },
+    {
+      "id": "retry",
+      "label": "Retry"
+    },
+    {
+      "id": "terminal",
+      "label": "Terminal"
+    }
+  ],
+  "states": [
+    {
+      "id": "a",
+      "type": "active",
+      "label": "A",
+      "lane": "main",
+      "col": 0
+    },
+    {
+      "id": "b",
+      "type": "active",
+      "label": "B",
+      "lane": "wait",
+      "col": 0
+    },
+    {
+      "id": "c",
+      "type": "active",
+      "label": "C",
+      "lane": "retry",
+      "col": 0
+    },
+    {
+      "id": "d",
+      "type": "active",
+      "label": "D",
+      "lane": "terminal",
+      "col": 0
+    }
+  ],
+  "transitions": [
+    {
+      "id": "ac",
+      "from": "a",
+      "to": "c"
+    },
+    {
+      "id": "ad",
+      "from": "a",
+      "to": "d"
+    },
+    {
+      "id": "bd",
+      "from": "b",
+      "to": "d"
+    },
+    {
+      "id": "ca",
+      "from": "c",
+      "to": "a"
+    }
+  ]
+}

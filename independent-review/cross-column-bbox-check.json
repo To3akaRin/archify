@@ -1,0 +1,68 @@
+[
+  {
+    "neighborWidth": 140,
+    "a": {
+      "x": 110.0,
+      "y": 56.0,
+      "width": 140.0,
+      "height": 64.0
+    },
+    "wide": {
+      "x": 60.0,
+      "y": 520.0,
+      "width": 240.0,
+      "height": 64.0
+    },
+    "neighbor": {
+      "x": 364.0,
+      "y": 520.0,
+      "width": 140.0,
+      "height": 64.0
+    },
+    "gapFromWidest": 64.0
+  },
+  {
+    "neighborWidth": 240,
+    "a": {
+      "x": 110.0,
+      "y": 56.0,
+      "width": 140.0,
+      "height": 64.0
+    },
+    "wide": {
+      "x": 60.0,
+      "y": 520.0,
+      "width": 240.0,
+      "height": 64.0
+    },
+    "neighbor": {
+      "x": 364.0,
+      "y": 520.0,
+      "width": 240.0,
+      "height": 64.0
+    },
+    "gapFromWidest": 64.0
+  },
+  {
+    "neighborWidth": 900,
+    "a": {
+      "x": 110.0,
+      "y": 56.0,
+      "width": 140.0,
+      "height": 64.0
+    },
+    "wide": {
+      "x": 60.0,
+      "y": 520.0,
+      "width": 240.0,
+      "height": 64.0
+    },
+    "neighbor": {
+      "x": 344.0,
+      "y": 520.0,
+      "width": 900.0,
+      "height": 64.0
+    },
+    "gapFromWidest": 44.0
+  }
+]

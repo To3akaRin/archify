@@ -1,0 +1,126 @@
+{
+  "schema_version": 2,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "Mixed spans",
+    "output": "mixed.html",
+    "quality_profile": "showcase"
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "main"
+    },
+    {
+      "id": "one",
+      "label": "one"
+    },
+    {
+      "id": "two",
+      "label": "two"
+    },
+    {
+      "id": "terminal",
+      "label": "terminal"
+    }
+  ],
+  "states": [
+    {
+      "id": "a",
+      "type": "active",
+      "label": "a",
+      "lane": "main",
+      "col": 0
+    },
+    {
+      "id": "b",
+      "type": "active",
+      "label": "b",
+      "lane": "one",
+      "col": 0
+    },
+    {
+      "id": "c",
+      "type": "active",
+      "label": "c",
+      "lane": "two",
+      "col": 0
+    },
+    {
+      "id": "d",
+      "type": "active",
+      "label": "d",
+      "lane": "terminal",
+      "col": 0
+    },
+    {
+      "id": "wide",
+      "type": "active",
+      "label": "Wide",
+      "lane": "two",
+      "col": 0,
+      "width": 240,
+      "yOffset": 96
+    },
+    {
+      "id": "neighbor",
+      "type": "active",
+      "label": "N",
+      "lane": "two",
+      "col": 1,
+      "yOffset": 96
+    }
+  ],
+  "transitions": [
+    {
+      "id": "t0",
+      "from": "a",
+      "to": "c"
+    },
+    {
+      "id": "t1",
+      "from": "c",
+      "to": "a"
+    },
+    {
+      "id": "t2",
+      "from": "a",
+      "to": "c"
+    },
+    {
+      "id": "t3",
+      "from": "c",
+      "to": "a"
+    },
+    {
+      "id": "t4",
+      "from": "a",
+      "to": "c"
+    },
+    {
+      "id": "t5",
+      "from": "d",
+      "to": "a"
+    },
+    {
+      "id": "t6",
+      "from": "a",
+      "to": "d"
+    },
+    {
+      "id": "t7",
+      "from": "d",
+      "to": "a"
+    },
+    {
+      "id": "t8",
+      "from": "a",
+      "to": "d"
+    },
+    {
+      "id": "t9",
+      "from": "d",
+      "to": "a"
+    }
+  ]
+}

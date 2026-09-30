@@ -1,0 +1,6 @@
+command: ["/Users/huangjing/.nvm/versions/node/v22.23.1/bin/node", "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/archify-lifecycle-route-bounds/archify/renderers/lifecycle/render-lifecycle.mjs", "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/inputs/deployment-release.lifecycle.json", "/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/candidate/deployment-release.lifecycle.html"]
+exitCode: 0
+stdout:
+/Users/huangjing/Documents/WorkCodeingPlace/WorkCodeingPlace/python_project/outputs/archify-20260930/pr625-revision/compatibility/candidate/deployment-release.lifecycle.html
+
+stderr:
