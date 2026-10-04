@@ -54,6 +54,19 @@ test('large legend rows reserve enough space even with the default line gap', ()
   assert.ok(measured.rects[1].y + measured.rects[1].height < measured.rects[2].y);
 });
 
+test('scaled legend retains renderer-owned label ink and weight', () => {
+  const svg = renderLegend({
+    entries,
+    layout: { ...layout, renderedFontSize: 15 },
+    renderSwatch: swatch,
+    locale: 'en',
+    labelClass: 't-primary',
+    labelWeight: 650,
+  });
+  assert.match(svg, /class="t-primary" font-size="15" font-weight="650">Backend/);
+  assert.match(svg, /class="t-primary" font-size="15" font-weight="650">Database/);
+});
+
 test('scaled legend rejects routes in the enlarged text bounds', () => {
   assert.throws(() => measureLegend(entries.slice(0, 1), {
     ...layout,

@@ -9,6 +9,15 @@ All notable changes are documented here. Format loosely follows [Keep a Changelo
 ### Added
 - **Workflow v2 字体与测量布局联动（#631）。** 新增可选 `meta.typography_scale`（1–2），让节点文本、泳道/阶段/分组标题、连线标签及图例共同参与布局测量；固定尺寸不足时返回结构化容量诊断。省略或设为 1 保持原有输出，schema v1 和其他图类型不变。
 
+### Fixed
+
+- **Brand ICO data bounds (#585).** Capture and pinned re-fetches reject empty, directory-overlapping or out-of-bounds image ranges in ICO directory entries, while preserving valid PNG/DIB payloads and normal icon fallback.
+
+### Changed
+- **Bundled Viewer catalogs selected by `meta.locale`.** `archify/locales/manifest.json` enrolls package-owned catalogs (`en`, `zh-CN`, `es`, `ko`); English and Simplified Chinese moved from renderer tuples into the same data. Each message resolves as valid `meta.translations` value → selected bundled catalog → English, so a one-key override keeps the rest of the language. Enrolling another language is a data-only change. Catalogs load relative to the installed package, never from the working directory, and standalone HTML still embeds only the resolved Viewer messages. (#588)
+- **Intentional differences from 3.0.1.** Locale-only `es`/`ko` now render Spanish/Korean UI instead of English. A partial `meta.translations` (including for `zh-CN`) now falls through to the same-language bundled catalog before English; in 3.0.1 every unsupplied key became English. Equivalent tag casing such as `zh-cn` selects the bundled catalog and emits its canonical tag; region and script variants such as `zh-Hant` still fall back to English. An unbundled tag whose translations are all unusable now falls back to English `lang` as well. Omitted-locale, `en`, `zh-CN`, and complete-catalog inputs render unchanged.
+- **Locale diagnostics.** `i18n/translation-coverage` now reports the final resolved coverage and lists missing keys with their English source text; rejected overrides (unknown keys, placeholder mismatches) are reported separately as `i18n/invalid-translation` and keep the lower-priority message. Passing `validate --json`, `deliver`, and `finalize` receipts now carry these `i18n/*` warnings in `diagnostics[]` (gates and exit codes are unchanged); previously `finalize` did not surface them at all.
+
 ## [3.0.1] — 2026-09-28
 
 ### Changed
