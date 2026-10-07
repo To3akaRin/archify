@@ -150,8 +150,8 @@ function nodeWidthContributor(node, workflow) {
   return `node ${node.id} width ${authoredNodeWidth(node, workflow)}px`;
 }
 
-function authoredNodeHeight(node, workflow) {
-  return workflowNodeSize(node, workflowTypography(workflow)).height;
+function authoredNodeHeight(node, workflow, sourceEvidence) {
+  return workflowNodeSize(node, workflowTypography(workflow), Boolean(sourceEvidence?.nodes?.[node.id]?.length)).height;
 }
 
 function workflowLabelWidth(label, typography) {
@@ -188,14 +188,14 @@ function readableGroupBounds(workflow, group, colXs) {
   return { x: left, width, cx: left + width / 2 };
 }
 
-function verticalIntervalsOverlap(a, b, clearance, workflow) {
+function verticalIntervalsOverlap(a, b, clearance, workflow, sourceEvidence) {
   const aCenter = Number(a?.yOffset) || 0;
   const bCenter = Number(b?.yOffset) || 0;
   return Math.abs(aCenter - bCenter)
-    < authoredNodeHeight(a, workflow) / 2 + authoredNodeHeight(b, workflow) / 2 + clearance;
+    < authoredNodeHeight(a, workflow, sourceEvidence) / 2 + authoredNodeHeight(b, workflow, sourceEvidence) / 2 + clearance;
 }
 
-function createReadableLayout(workflow, layoutFeedback = {}) {
+function createReadableLayout(workflow, layoutFeedback = {}, sourceEvidence) {
   const typography = workflowTypography(workflow);
   const columnCount = 6;
   const baselinePitch = 120;
@@ -229,7 +229,7 @@ function createReadableLayout(workflow, layoutFeedback = {}) {
       const leftNode = nodes[leftIndex];
       const rightNode = nodes[rightIndex];
       if (leftNode.lane !== rightNode.lane || leftNode.col === rightNode.col) continue;
-      if (!verticalIntervalsOverlap(leftNode, rightNode, 8, workflow)) continue;
+      if (!verticalIntervalsOverlap(leftNode, rightNode, 8, workflow, sourceEvidence)) continue;
       const fromNode = leftNode.col < rightNode.col ? leftNode : rightNode;
       const toNode = fromNode === leftNode ? rightNode : leftNode;
       constraints.push({
@@ -518,8 +518,9 @@ function createReadableLayout(workflow, layoutFeedback = {}) {
     for (const node of nodes) {
       if (laneId !== undefined && node.lane !== laneId) continue;
       const yOffset = Number(node.yOffset) || 0;
-      const extent = authoredNodeHeight(node, workflow) / 2 + Math.abs(yOffset);
-      const contributor = `node ${node.id} height ${authoredNodeHeight(node, workflow)}px${yOffset ? ` with yOffset ${yOffset}px` : ''}`;
+      const height = authoredNodeHeight(node, workflow, sourceEvidence);
+      const extent = height / 2 + Math.abs(yOffset);
+      const contributor = `node ${node.id} height ${height}px${yOffset ? ` with yOffset ${yOffset}px` : ''}`;
       if (extent > maximum + 0.0001) {
         maximum = extent;
         contributors.clear();
@@ -568,12 +569,13 @@ function createReadableLayout(workflow, layoutFeedback = {}) {
         const nodeLeft = colXs[node.col] - halfWidth;
         const nodeRight = colXs[node.col] + halfWidth;
         const overlapsLabel = nodeRight > labelLeft && nodeLeft < labelRight;
-        const topOffset = (baseContentH - authoredNodeHeight(node, workflow)) / 2
+        const height = authoredNodeHeight(node, workflow, sourceEvidence);
+        const topOffset = (baseContentH - height) / 2
           + (Number(node.yOffset) || 0);
         const minimumTopOffset = overlapsLabel ? typography.groupInset - 2 + typography.groupHeight - typography.groupAscent + 1 : 9;
         header = Math.max(header, Math.ceil(minimumTopOffset - topOffset));
         const bottomMargin = baseContentH - GROUP_FRAME_BOTTOM_INSET
-          - topOffset - authoredNodeHeight(node, workflow);
+          - topOffset - height;
         footer = Math.max(footer, Math.ceil(1 - bottomMargin));
       }
     }
@@ -656,6 +658,23 @@ function stableValueKey(value) {
 
 function cloneWorkflow(value) {
   return JSON.parse(JSON.stringify(value));
+}
+
+function preserveResolvedWorkflowBrands(workflow, candidate) {
+  const originals = new Map(asArray(workflow.nodes).map((node) => [node.id, node]));
+  for (const node of asArray(candidate.nodes)) {
+    const original = originals.get(node.id);
+    const mark = brandMarkFor(original);
+    if (!mark || stableValueKey(original.brand) !== stableValueKey(node.brand)) continue;
+    // 候选可能重新排序；按 ID 继承已解析品牌，仅复制其 Symbol，不恢复被删的作者字段。
+    for (const symbol of Object.getOwnPropertySymbols(original)) {
+      const descriptor = Object.getOwnPropertyDescriptor(original, symbol);
+      if (descriptor?.value !== mark) continue;
+      Object.defineProperty(node, symbol, descriptor);
+      break;
+    }
+  }
+  return candidate;
 }
 
 function canonicalReadableWorkflow(workflow) {
@@ -935,10 +954,10 @@ function createWorkflowLaneGeometry(workflow, layout, legendExtraHeight, minimum
 
 // Node measurement: the measured node map and the text-fit sizes every later
 // phase reads. Kept together so the compiler body reads as phases.
-function measureWorkflowNodes(workflow, layout, laneGeometry) {
+function measureWorkflowNodes(workflow, layout, laneGeometry, sourceEvidence) {
   const { laneHeight, laneGroupHeaderH, laneGroupFooterH, laneTop } = laneGeometry;
   function measureNode(node) {
-    const { width, height } = workflowNodeSize(node, workflowTypography(workflow));
+    const { width, height } = workflowNodeSize(node, workflowTypography(workflow), Boolean(sourceEvidence?.nodes?.[node.id]?.length));
     const cx = layout.colXs[node.col];
     const groupHeaderH = laneGroupHeaderH(node.lane);
     const contentH = laneHeight(node.lane) - layout.laneTitleH
@@ -992,6 +1011,7 @@ function createLegacyCapacityRepair({
   discoverFixes,
   resolvedQualityProfile,
   authoredQualityProfile,
+  sourceEvidence,
   nodeTextFit,
   acceptsFix,
 }) {
@@ -1014,7 +1034,7 @@ function createLegacyCapacityRepair({
     }
 
     function readableMigrationProvidesCapacity(from, to, requiredClearance) {
-      const readable = createReadableLayout({ ...workflow, schema_version: 2 });
+      const readable = createReadableLayout({ ...workflow, schema_version: 2 }, {}, sourceEvidence);
       const centerDistance = Math.abs(readable.colXs[to.col] - readable.colXs[from.col]);
       if (centerDistance - from.width / 2 - to.width / 2 < requiredClearance) return false;
       if (!discoverFixes) return false;
@@ -1022,14 +1042,16 @@ function createLegacyCapacityRepair({
       return withDiagnosticRecordingSuppressed(() => {
         const migrationQualityProfile = authoredQualityProfile;
         let planned = compileWorkflowWithFeedback({
-          workflow: intrinsicWorkflow(workflow),
+          workflow: preserveResolvedWorkflowBrands(workflow, intrinsicWorkflow(workflow)),
           qualityProfile: migrationQualityProfile,
+          sourceEvidence,
           discoverFixes: false,
         });
         if (!planned.ok) {
           planned = compileWorkflowWithFeedback({
-            workflow: planningWorkflow(workflow),
+            workflow: preserveResolvedWorkflowBrands(workflow, planningWorkflow(workflow)),
             qualityProfile: migrationQualityProfile,
+            sourceEvidence,
             discoverFixes: false,
           });
         }
@@ -1037,17 +1059,18 @@ function createLegacyCapacityRepair({
 
         let candidate;
         try {
-          candidate = createMappedWorkflowCandidate(
+          candidate = preserveResolvedWorkflowBrands(workflow, createMappedWorkflowCandidate(
             workflow,
             LEGACY_COLUMN_CENTERS,
             planned.receipt.columns,
-          ).document;
+          ).document);
         } catch {
           return false;
         }
         let compiled = compileWorkflowWithFeedback({
           workflow: candidate,
           qualityProfile: migrationQualityProfile,
+          sourceEvidence,
           discoverFixes: false,
         });
         const requiredViewBox = compiled.diagnostics?.length
@@ -1063,6 +1086,7 @@ function createLegacyCapacityRepair({
           compiled = compileWorkflowWithFeedback({
             workflow: candidate,
             qualityProfile: migrationQualityProfile,
+            sourceEvidence,
             discoverFixes: false,
           });
         }
@@ -1105,7 +1129,7 @@ function createLegacyCapacityRepair({
       const from = nodes.get(edge.from);
       const to = nodes.get(edge.to);
       if (!from || !to || from.lane !== to.lane || from.col === to.col) continue;
-      if (!verticalIntervalsOverlap(from, to, 8, workflow)) continue;
+      if (!verticalIntervalsOverlap(from, to, 8, workflow, sourceEvidence)) continue;
       const centerDistance = Math.abs(to.cx - from.cx);
       const actualSignedClearance = centerDistance - from.width / 2 - to.width / 2;
       const direct = !edge.via && ['auto', 'straight'].includes(edge.route || 'auto')
@@ -1346,7 +1370,7 @@ function compileWorkflowInternal({
     edges: new Map(asArray(qualityResolvedWorkflow.edges).map((edge, index) => [edge, index])),
   };
   const layout = workflow.schema_version === 2
-    ? createReadableLayout(workflow, layoutFeedback)
+    ? createReadableLayout(workflow, layoutFeedback, sourceEvidence)
     : createLegacyLayout();
 
 const {
@@ -1404,7 +1428,7 @@ function workflowLegendRects() {
   ];
 }
 
-const { measureNode, nodeTextFit, nodes } = measureWorkflowNodes(workflow, layout, laneGeometry);
+const { measureNode, nodeTextFit, nodes } = measureWorkflowNodes(workflow, layout, laneGeometry, sourceEvidence);
 
 // Obstacles of the routing search are queried through a uniform grid instead of
 // scanned: a candidate can only fail an obstacle its own box can reach.
@@ -1504,9 +1528,11 @@ const edgeIndexByEdge = new Map(asArray(workflow.edges).map((edge, index) => [ed
     if (!discoverFixes) return false;
     const candidate = cloneWorkflow(workflow);
     mutator(candidate);
+    preserveResolvedWorkflowBrands(workflow, candidate);
     return withDiagnosticRecordingSuppressed(() => compileWorkflowWithFeedback({
       workflow: candidate,
       qualityProfile: resolvedQualityProfile,
+      sourceEvidence,
       discoverFixes: false,
     }).ok);
   }
@@ -1545,6 +1571,7 @@ const { enforceLegacyColumnCapacity } = createLegacyCapacityRepair({
   discoverFixes,
   resolvedQualityProfile,
   authoredQualityProfile,
+  sourceEvidence,
   nodeTextFit,
   acceptsFix,
 });
@@ -3004,7 +3031,7 @@ function validateReadableInputsBeforeRouting() {
         document.nodes[canonicalIndex].width = Math.max(node.width, requiredWidth);
         document.nodes[canonicalIndex].height = Math.max(node.height, requiredHeight);
       })) supportedFixes.push(`set /nodes/${index}/width to ${Math.max(node.width, requiredWidth)} and /nodes/${index}/height to ${Math.max(node.height, requiredHeight)}`);
-      if (acceptsFix((document) => {
+      if ((authoredNode.width !== undefined || authoredNode.height !== undefined) && acceptsFix((document) => {
         delete document.nodes[canonicalIndex].width;
         delete document.nodes[canonicalIndex].height;
       })) supportedFixes.push(`remove /nodes/${index}/width and /nodes/${index}/height to use measured automatic dimensions`);

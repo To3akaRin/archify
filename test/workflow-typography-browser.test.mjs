@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { ChromeVisualBrowser, findChrome } from '../archify/bin/visual-check.mjs';
-import { typographyFixture, runWorkflow } from './helpers/workflow-typography.mjs';
+import { typographyFixture, runWorkflow, sourceTypographyFixture } from './helpers/workflow-typography.mjs';
 
 const chrome = Object.hasOwn(process.env, 'ARCHIFY_CHROME') ? findChrome() : null;
 
@@ -162,5 +162,94 @@ for (const [name, scale] of [['ordinary', 1.5], ['ordinary', 2], ['dense', 1.5],
         t.diagnostic(`${name}/${scale}/${width}x${height}/${theme}: visible caption ${pair.before.visibleCaptionMin.toFixed(2)} -> ${pair.after.visibleCaptionMin.toFixed(2)}; all authored captions/tags ${pair.before.captionMin.toFixed(2)} -> ${pair.after.captionMin.toFixed(2)} CSS px`);
       }
     }
+  });
+}
+
+async function inspectSourceNode(browser) {
+  const session = await browser.sessionPromise;
+  const result = await browser.cdp.send('Runtime.evaluate', { returnByValue: true, awaitPromise: true, expression: `(async () => {
+    await document.fonts.ready;
+    await Archify.layoutStability.whenStable();
+    const node = document.querySelector('.diagram-container svg [data-node-id="process"]');
+    node.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    await Archify.layoutStability.whenStable();
+    const box = element => {
+      const rect = element.getBoundingClientRect();
+      return { left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, width: rect.width, height: rect.height };
+    };
+    const overlaps = (a, b) => a.left < b.right - 0.25 && b.left < a.right - 0.25
+      && a.top < b.bottom - 0.25 && b.top < a.bottom - 0.25;
+    const inside = (a, b) => a.left >= b.left - 0.75 && a.right <= b.right + 0.75
+      && a.top >= b.top - 0.75 && a.bottom <= b.bottom + 0.75;
+    const shape = box(node.querySelector(':scope > rect.c-mask'));
+    const texts = [...node.querySelectorAll(':scope > text')].map(text => ({ text: text.textContent, box: box(text) }));
+    const decorations = [...node.querySelectorAll('[data-semantic-sigil], .brand-mark')]
+      .map(element => ({ kind: element.hasAttribute('data-brand-mark') ? 'brand' : 'sigil', box: box(element) }));
+    const panel = document.getElementById('focus-evidence');
+    return {
+      sourceCount: node.getAttribute('data-source-evidence-count'), sourceAria: node.getAttribute('aria-label'),
+      sources: Archify.sourceEvidence.node('process'),
+      sourcePanelVisible: !panel.hidden,
+      sourceLinks: [...panel.querySelectorAll('a.semantic-passport-source')].map(link => link.getAttribute('href')),
+      sourceBadges: document.querySelectorAll('[data-source-evidence-beacon]').length,
+      hasBrand: Boolean(node.querySelector('[data-brand-mark="openai"]')),
+      decorationOverflow: decorations.filter(decoration => !inside(decoration.box, shape)).map(decoration => decoration.kind),
+      decorationTextOverlap: decorations.flatMap(decoration => texts.filter(text => overlaps(text.box, decoration.box))
+        .map(text => [decoration.kind, text.text])),
+    };
+  })()` }, session);
+  assert.equal(result.exceptionDetails, undefined, JSON.stringify(result.exceptionDetails));
+  return result.result.value;
+}
+
+for (const fixtureCase of [
+  { name: 'source-fractional', scale: 1.01, theme: 'light' },
+  { name: 'source-brand-tag', scale: 2, node: { brand: 'openai', tag: 'verified' }, theme: 'dark' },
+]) {
+  test(`source-backed browser keeps evidence discoverable and decorated text contained: ${fixtureCase.name}`, {
+    skip: !chrome, timeout: 120000,
+  }, async t => {
+    const fixture = sourceTypographyFixture(t, fixtureCase);
+    const artifact = runWorkflow(t, fixture.diagram, 'render', { repoRoot: fixture.root });
+    assert.equal(artifact.status, 0, artifact.stdout + artifact.stderr);
+    const browser = new ChromeVisualBrowser(chrome);
+    t.after(() => browser.close());
+    let evidence;
+    if (process.env.ARCHIFY_TYPOGRAPHY_EVIDENCE_DIR) {
+      fs.mkdirSync(process.env.ARCHIFY_TYPOGRAPHY_EVIDENCE_DIR, { recursive: true });
+      evidence = fs.mkdtempSync(path.join(process.env.ARCHIFY_TYPOGRAPHY_EVIDENCE_DIR, `${fixtureCase.name}-`));
+      fs.copyFileSync(artifact.output, path.join(evidence, 'source.html'));
+    }
+    await browser.inspect({ artifactPath: artifact.output, width: 1440, height: 900, theme: fixtureCase.theme,
+      ...(evidence ? { screenshotPath: path.join(evidence, 'source.png') } : {}),
+    });
+    const initial = await inspectTypography(browser);
+    assert.deepEqual(initial.nodes[0].overflow, [], 'source-backed rows must remain inside their automatically sized box');
+    assert.deepEqual(initial.nodes[0].overlaps, [], 'source-backed text rows must not overlap');
+    assert.deepEqual(initial.outsideSvg, []);
+    const source = await inspectSourceNode(browser);
+    assert.equal(source.sourceCount, '1');
+    assert.match(source.sourceAria, /1 verified source reference/);
+    assert.equal(source.sources.length, 1);
+    assert.equal(source.sources[0].path, 'source.js');
+    assert.equal(source.sourcePanelVisible, true);
+    assert.deepEqual(source.sourceLinks, [`${fixture.url}/blob/${fixture.revision}/source.js#L1`]);
+    // 当前 Viewer 在 Focus/Finder 中呈现来源，不能为了测试复活已移除的 SRC 徽章。
+    assert.equal(source.sourceBadges, 0);
+    assert.equal(source.hasBrand, Boolean(fixtureCase.node?.brand));
+    assert.deepEqual(source.decorationOverflow, []);
+    assert.deepEqual(source.decorationTextOverlap, []);
+    if (fixtureCase.node?.tag) {
+      // inspectSourceNode 已聚焦；先复位选择，再沿已有点击流程验证 fine/tag 真正显示。
+      const session = await browser.sessionPromise;
+      await browser.cdp.send('Runtime.evaluate', { expression: `document.querySelector('[data-node-id="process"]').dispatchEvent(new MouseEvent('click', { bubbles: true }))` }, session);
+      const focus = await revealFirstNodeTag(browser);
+      assert.equal(focus.revealed, true);
+      const focused = (await inspectTypography(browser)).nodes[0];
+      assert.deepEqual(focused.overflow, []);
+      assert.deepEqual(focused.overlaps, []);
+      assert.ok(focused.texts.some(text => text.role === 'tag' && text.visible));
+    }
+    if (evidence) fs.writeFileSync(path.join(evidence, 'measurements.json'), JSON.stringify({ initial, source }, null, 2));
   });
 }

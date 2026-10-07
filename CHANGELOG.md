@@ -13,6 +13,8 @@ All notable changes are documented here. Format loosely follows [Keep a Changelo
 
 ### Fixed
 
+- **Workflow 字体缩放的源码上下文容量检查（#649）。** 自动高度与容量校验共同考虑已验证的源码信息和品牌图标，布局各阶段使用一致尺寸；修复建议保留来源上下文，并通过真实 CLI 重放验证。默认倍率和作者明确指定的尺寸契约保持不变。
+
 - **SVG 路径检查（#641）。** 统一解析关系线和结构边界的 `M/L/H/V/Q/Z` 路径，正确保留子路径与闭合语义；截断参数、非法数值和不支持的命令现在有限失败并给出定位诊断，避免检查挂起、漏检或虚构跨子路径线段。非共线 `Q` 前后的直线保留真实连续性，避免虚假交叉、标签遮挡和漏检；曲线采样点不会增加微线段预算。普通有效产物的 9 项检查保持不变。
 - **Inactive brand icon declarations.** Capture ignores icon markup in comments, raw text (including `noscript` for `text/html`), quoted attributes and templates, so inactive page edits cannot replace the selected image or break its pinned digest. Complete link attributes keep quoted delimiters and distinguish `href` from `data-href`; XHTML `noscript` discovery and links after empty elements are preserved. Old pins to inactive markup may require inspecting and explicitly recapturing the intended icon; digest checking remains enforced.
 - **Brand ICO data bounds (#585).** Capture and pinned re-fetches reject empty, directory-overlapping or out-of-bounds image ranges in ICO directory entries, while preserving valid PNG/DIB payloads and normal icon fallback.

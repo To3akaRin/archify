@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { createHash } from 'node:crypto';
 import { compileWorkflow } from '../archify/renderers/workflow/workflow-compiler.mjs';
-import { typographyFixture, runWorkflow, svgFacts } from './helpers/workflow-typography.mjs';
+import { typographyFixture, runWorkflow, svgFacts, sourceTypographyFixture, sourceEvidencePayload } from './helpers/workflow-typography.mjs';
 
 const baselineFingerprints = JSON.parse(fs.readFileSync(new URL('./fixtures/workflow-typography/baseline-svg-sha256.json', import.meta.url), 'utf8'));
 const svgHash = svg => createHash('sha256').update(svg.replace(/\r\n?/g, '\n')).digest('hex');
@@ -238,3 +238,195 @@ test('layout receipts report rendered fonts without mutating the authored input'
     }
   }
 });
+
+function assertSourceRetained(rendered, fixture, diagram) {
+  const evidence = sourceEvidencePayload(rendered.html);
+  const sourcedNodes = diagram.nodes.filter(node => node.sources?.length);
+  assert.equal(evidence.verified, true);
+  assert.equal(evidence.referenceCount, sourcedNodes.reduce((count, node) => count + node.sources.length, 0));
+  assert.equal(evidence.repository.revision, fixture.revision);
+  assert.deepEqual(Object.keys(evidence.nodes).sort(), sourcedNodes.map(node => node.id).sort());
+  for (const node of sourcedNodes) {
+    assert.equal(evidence.nodes[node.id][0].href, `${fixture.url}/blob/${fixture.revision}/source.js#L1`);
+  }
+  const facts = svgFacts(rendered.svg);
+  const texts = facts.texts.map(text => text.text);
+  for (const node of diagram.nodes) {
+    for (const field of ['label', 'sublabel', 'tag']) {
+      if (node[field]) assert.ok(texts.includes(node[field]), `${node.id}/${field} must be retained`);
+    }
+  }
+  assert.deepEqual(facts.nodes.map(node => node.id).sort(), diagram.nodes.map(node => node.id).sort());
+  assert.deepEqual(JSON.parse(fs.readFileSync(rendered.input, 'utf8')), diagram, 'CLI must not rewrite the authored input');
+  return facts;
+}
+
+for (const fixtureCase of [
+  { name: 'source-only 1.01', scale: 1.01 },
+  { name: 'source and brand 1.1', scale: 1.1, node: { brand: 'openai' } },
+  { name: 'source and tag 1.5', scale: 1.5, node: { tag: 'verified' }, quality: 'standard' },
+  { name: 'source, brand and tag 2', scale: 2, node: { brand: 'openai', tag: 'verified' } },
+]) {
+  test(`source-backed automatic typography validates and renders: ${fixtureCase.name}`, t => {
+    const fixture = sourceTypographyFixture(t, fixtureCase);
+    const snapshot = structuredClone(fixture.diagram);
+    const options = { repoRoot: fixture.root, quality: fixtureCase.quality };
+    const validation = runWorkflow(t, fixture.diagram, 'validate', options);
+    assert.equal(validation.status, 0, validation.stdout + validation.stderr);
+    assert.equal(validation.receipt.ok, true);
+    const rendered = runWorkflow(t, fixture.diagram, 'render', options);
+    assert.equal(rendered.status, 0, rendered.stdout + rendered.stderr);
+    assertSourceRetained(rendered, fixture, snapshot);
+    assert.deepEqual(fixture.diagram, snapshot);
+    assert.equal(Object.hasOwn(fixture.diagram.nodes[0], 'width'), false);
+    assert.equal(Object.hasOwn(fixture.diagram.nodes[0], 'height'), false);
+  });
+}
+
+for (const fixtureCase of [
+  { name: 'source-only', scale: 1.01, node: { width: 92, height: 53 }, requiredHeight: 54 },
+  { name: 'source and brand', scale: 1.1, node: { brand: 'openai', width: 136, height: 59 }, requiredHeight: 60, reverseAuthoredOrder: true },
+]) {
+  test(`source-backed repair verification keeps other authored source constraints: ${fixtureCase.name}`, t => {
+    const fixture = sourceTypographyFixture(t, fixtureCase);
+    fixture.diagram.nodes.push({ ...structuredClone(fixture.diagram.nodes[0]), id: 'record', col: 2 });
+    if (fixtureCase.reverseAuthoredOrder) fixture.diagram.nodes.reverse();
+    const snapshot = structuredClone(fixture.diagram);
+    const options = { repoRoot: fixture.root };
+    const failure = runWorkflow(t, fixture.diagram, 'validate', options);
+    assert.equal(failure.status, 1, failure.stdout + failure.stderr);
+    const diagnostic = failure.receipt.diagnostics.find(issue => issue.code === 'workflow/typography-capacity');
+    assert.ok(diagnostic, failure.stdout);
+    const failingIndex = fixture.diagram.nodes.findIndex(node => node.id === diagnostic.subject.node);
+    assert.ok(failingIndex >= 0);
+    assert.equal(diagnostic.subject.path, `/nodes/${failingIndex}`);
+    // 源码或品牌信息丢失会降低探测中的所需高度，单独修一个却仍不能通过真实整图验证。
+    // 两个节点都有显式高度，所以自动尺寸修复不能掩盖这个来源上下文回归。
+    assert.deepEqual(diagnostic.supportedFixes, [], 'do not advertise a one-node repair while another authored source box still fails');
+    const otherId = fixture.diagram.nodes.find(node => node.id !== diagnostic.subject.node).id;
+    const oneRemaining = structuredClone(fixture.diagram);
+    oneRemaining.nodes.find(node => node.id === otherId).height = fixtureCase.requiredHeight;
+    const remaining = runWorkflow(t, oneRemaining, 'validate', options);
+    assert.equal(remaining.status, 1, remaining.stdout + remaining.stderr);
+    const actionable = remaining.receipt.diagnostics.find(issue => issue.code === 'workflow/typography-capacity');
+    assert.ok(actionable?.supportedFixes.length, remaining.stdout);
+    assert.deepEqual(actionable.subject, diagnostic.subject, 'diagnostic indexes must still name the authored node');
+    for (const suggestion of actionable.supportedFixes) {
+      const repaired = applyTypographyRepair(oneRemaining, suggestion);
+      assert.equal(repaired.nodes.find(node => node.id === otherId).height, fixtureCase.requiredHeight, 'repair must preserve the other authored box');
+      const validated = runWorkflow(t, repaired, 'validate', options);
+      assert.equal(validated.status, 0, `${suggestion}\n${validated.stdout}\n${validated.stderr}`);
+      const rendered = runWorkflow(t, repaired, 'render', options);
+      assert.equal(rendered.status, 0, `${suggestion}\n${rendered.stdout}\n${rendered.stderr}`);
+      assertSourceRetained(rendered, fixture, repaired);
+    }
+    assert.deepEqual(fixture.diagram, snapshot);
+    assert.deepEqual(JSON.parse(fs.readFileSync(failure.input, 'utf8')), snapshot);
+  });
+}
+
+test('source-backed automatic height participates in offset lane planning', t => {
+  const fixture = sourceTypographyFixture(t, { scale: 1.01, node: { yOffset: 30 } });
+  const snapshot = structuredClone(fixture.diagram);
+  const options = { repoRoot: fixture.root };
+  const rendered = runWorkflow(t, fixture.diagram, 'render', options);
+  assert.equal(rendered.status, 0, rendered.stdout + rendered.stderr);
+  const facts = assertSourceRetained(rendered, fixture, snapshot);
+  const layout = runWorkflow(t, fixture.diagram, 'validate', { ...options, layoutJson: true });
+  assert.equal(layout.status, 0, layout.stdout + layout.stderr);
+  assert.deepEqual(layout.receipt.viewBox, facts.viewBox.slice(2));
+  const rectangle = ({ id, x, y, width, height }) => ({ id, x, y, width, height });
+  assert.deepEqual(layout.receipt.nodes.map(rectangle), facts.nodes.map(rectangle));
+  const pinned = structuredClone(fixture.diagram);
+  pinned.nodes[0].height = facts.nodes[0].height;
+  const explicit = runWorkflow(t, pinned, 'render', options);
+  assert.equal(explicit.status, 0, explicit.stdout + explicit.stderr);
+  // 显式写回已经测得的同一高度，不应再改变泳道、节点位置或画布。
+  assert.equal(explicit.svg, rendered.svg, 'planning must use the same automatic height that SVG serialization uses');
+  assert.deepEqual(fixture.diagram, snapshot);
+});
+
+test('source-backed omitted and scale-one typography preserve identical HTML', t => {
+  const fixture = sourceTypographyFixture(t);
+  fixture.diagram.nodes.push({ ...structuredClone(fixture.diagram.nodes[0]), id: 'branded', col: 1,
+    brand: 'openai', tag: 'verified', width: 140, height: 80 });
+  const options = { repoRoot: fixture.root };
+  const omitted = runWorkflow(t, fixture.diagram, 'render', options);
+  assert.equal(omitted.status, 0, omitted.stdout + omitted.stderr);
+  const explicit = structuredClone(fixture.diagram);
+  explicit.meta.typography_scale = 1;
+  const scaled = runWorkflow(t, explicit, 'render', options);
+  assert.equal(scaled.status, 0, scaled.stdout + scaled.stderr);
+  assert.equal(scaled.html, omitted.html);
+  const facts = assertSourceRetained(scaled, fixture, explicit);
+  const automatic = facts.nodes.find(node => node.id === 'process');
+  assert.deepEqual([automatic.width, automatic.height], [92, 52], 'default source-backed automatic geometry remains unchanged');
+});
+
+for (const fixtureCase of [
+  { name: 'authored width with automatic height', scale: 1.01, node: { width: 92 } },
+  { name: 'authored height with automatic branded width', scale: 1.1, node: { brand: 'openai', height: 80 } },
+  { name: 'both authored dimensions with brand and tag', scale: 1.5, node: { brand: 'openai', tag: 'verified', width: 260, height: 140 }, viewBox: [1100, 600] },
+]) {
+  test(`source-backed typography preserves ${fixtureCase.name}`, t => {
+    const fixture = sourceTypographyFixture(t, fixtureCase);
+    if (fixtureCase.viewBox) fixture.diagram.meta.viewBox = fixtureCase.viewBox;
+    const snapshot = structuredClone(fixture.diagram);
+    const options = { repoRoot: fixture.root };
+    const validation = runWorkflow(t, fixture.diagram, 'validate', options);
+    assert.equal(validation.status, 0, validation.stdout + validation.stderr);
+    const rendered = runWorkflow(t, fixture.diagram, 'render', options);
+    assert.equal(rendered.status, 0, rendered.stdout + rendered.stderr);
+    const facts = assertSourceRetained(rendered, fixture, snapshot);
+    for (const dimension of ['width', 'height']) {
+      if (Object.hasOwn(fixtureCase.node, dimension)) assert.equal(facts.nodes[0][dimension], fixtureCase.node[dimension]);
+    }
+    if (fixtureCase.viewBox) assert.deepEqual(facts.viewBox, [0, 0, ...fixtureCase.viewBox]);
+    assert.deepEqual(fixture.diagram, snapshot);
+  });
+}
+
+function applyTypographyRepair(diagram, suggestion) {
+  const candidate = structuredClone(diagram);
+  const set = suggestion.match(/^set \/nodes\/(\d+)\/width to ([\d.]+) and \/nodes\/\1\/height to ([\d.]+)$/);
+  const remove = suggestion.match(/^remove \/nodes\/(\d+)\/width and \/nodes\/\1\/height to use measured automatic dimensions$/);
+  assert.ok(set || remove, `Unrecognized public typography repair: ${suggestion}`);
+  if (set) Object.assign(candidate.nodes[Number(set[1])], { width: Number(set[2]), height: Number(set[3]) });
+  else {
+    const node = candidate.nodes[Number(remove[1])];
+    assert.ok(Object.hasOwn(node, 'width') || Object.hasOwn(node, 'height'), 'deletion must change an authored field');
+    delete node.width;
+    delete node.height;
+  }
+  return candidate;
+}
+
+for (const fixtureCase of [
+  { name: 'source-only', scale: 1.01, node: { width: 92, height: 40 } },
+  { name: 'source and brand', scale: 1.1, node: { brand: 'openai', height: 40 } },
+]) {
+  test(`every typography repair replays with verified source context: ${fixtureCase.name}`, t => {
+    const fixture = sourceTypographyFixture(t, fixtureCase);
+    const snapshot = structuredClone(fixture.diagram);
+    const options = { repoRoot: fixture.root };
+    const failure = runWorkflow(t, fixture.diagram, 'validate', options);
+    assert.equal(failure.status, 1, failure.stdout + failure.stderr);
+    const diagnostic = failure.receipt.diagnostics.find(issue => issue.code === 'workflow/typography-capacity');
+    assert.ok(diagnostic, failure.stdout);
+    assert.equal(diagnostic.subject.node, 'process');
+    assert.equal(diagnostic.evidence.height, 40, 'an explicit failing height must not be silently grown');
+    assert.ok(diagnostic.supportedFixes.length > 0, failure.stdout);
+    for (const suggestion of diagnostic.supportedFixes) {
+      const repaired = applyTypographyRepair(fixture.diagram, suggestion);
+      assert.deepEqual(repaired.meta, fixture.diagram.meta, 'repair must preserve repository/scale metadata');
+      assert.deepEqual(repaired.nodes[0].sources, fixture.diagram.nodes[0].sources);
+      const validation = runWorkflow(t, repaired, 'validate', options);
+      assert.equal(validation.status, 0, `${suggestion}\n${validation.stdout}\n${validation.stderr}`);
+      const rendered = runWorkflow(t, repaired, 'render', options);
+      assert.equal(rendered.status, 0, `${suggestion}\n${rendered.stdout}\n${rendered.stderr}`);
+      assertSourceRetained(rendered, fixture, repaired);
+    }
+    assert.deepEqual(fixture.diagram, snapshot);
+    assert.deepEqual(JSON.parse(fs.readFileSync(failure.input, 'utf8')), snapshot);
+  });
+}

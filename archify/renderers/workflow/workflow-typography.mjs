@@ -27,7 +27,7 @@ export function workflowTypography(workflow) {
   };
 }
 
-export function workflowNodeSize(node, typography) {
+export function workflowNodeSize(node, typography, source = false) {
   const { scale } = typography;
   let width = 92;
   if (scale !== 1) {
@@ -37,10 +37,13 @@ export function workflowNodeSize(node, typography) {
       textUnits(node.tag || '') * typography.tagPreferred * 0.6 + 8,
     ));
   }
-  return {
-    width: node.width ?? width,
-    height: node.height ?? Math.ceil((node.tag ? 68 : 52) * scale),
-  };
+  width = node.width ?? width;
+  let height = node.height ?? Math.ceil((node.tag ? 68 : 52) * scale);
+  // 先确定最终宽度，再为来源与品牌装饰下的真实文本行预留自动高度。
+  if (scale !== 1 && node.height === undefined) {
+    height = Math.max(height, workflowNodeMinimumHeight({ ...node, width }, typography, source));
+  }
+  return { width, height };
 }
 
 export function workflowNodeText(node, typography, source = false) {
