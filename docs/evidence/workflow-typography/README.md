@@ -1,5 +1,7 @@
 # Workflow v2 字体缩放验证（#631）
 
+2026-10-07 两条源码上下文容量审查的修复与验证见[本轮记录](source-capacity-review/README.md)。
+
 2026-10-04 的维护者跟进见 [字体布局与 Viewer 放大的三状态对照](zoom-comparison/README.md)：
 基于最新 `dev` 的公开发布流程、可交互 HTML、同视口截图、真实字号/上下文和性能采样。
 下文保留原 `f12947c` 基线的合成用例证据，不将旧结果重新标成最新基线测试。
@@ -19,15 +21,16 @@
 
 ## 可复现比较
 
-固定输入位于 `archify/test/fixtures/workflow-typography/`。每对比较使用相同输入，
+固定输入现位于 `test/fixtures/workflow-typography/`。每对比较使用相同输入，
 只增加 `meta.typography_scale`；未删除标签、节点或关系。默认 SVG 的摘要冻结到上述上游基线，
 因此候选版本省略配置的行为有独立兼容性检查，非仅候选版本内部自比较。
 
-在仓库根目录执行（用实际 Chrome 路径替换占位符）：
+以下命令适用于测试迁入仓库根目录后的结构（用实际 Chrome 路径替换占位符）。
+重新执行会测量当前源码；下面保留的数值仍属于上面标明的历史提交。
 
 ```bash
-cd archify
 npm ci
+npm --prefix archify ci
 node --test test/workflow-typography.test.mjs test/legend-typography.test.mjs
 ARCHIFY_CHROME="/path/to/chrome" \
 ARCHIFY_TYPOGRAPHY_EVIDENCE_DIR="/tmp/workflow-typography-evidence" \
