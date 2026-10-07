@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 
@@ -20,13 +20,14 @@ function usage() {
   [--out-dir <directory>] [--benchmark-runs <5..51>] [--benchmark-warmups <1..10>]
 
 Use official Node 22.23.1 with zlib 1.3.1-e00f703. The base checkout must be
-${sourceCommit}. The default candidate is this repository;
-the default output is this script's directory. Benchmarking is opt-in and serial.
+${sourceCommit}. The default candidate is this repository.
+Output uses a fresh temporary directory, whose path is printed. An explicit
+--out-dir must be new or empty. Benchmarking is opt-in and serial.
 No browser, installation, network access, Git mutation or test suite is run.`);
 }
 
 function options(args) {
-  const result = { candidateRepo: path.resolve(here, '../../../..'), outDir: here, benchmarkRuns: 0, benchmarkWarmups: 2 };
+  const result = { candidateRepo: path.resolve(here, '../../../..'), benchmarkRuns: 0, benchmarkWarmups: 2 };
   const names = new Map([
     ['--base-repo', 'baseRepo'], ['--candidate-repo', 'candidateRepo'], ['--out-dir', 'outDir'],
     ['--benchmark-runs', 'benchmarkRuns'], ['--benchmark-warmups', 'benchmarkWarmups'],
@@ -46,6 +47,19 @@ function options(args) {
     throw new Error('--benchmark-warmups must be an integer from 1 to 10.');
   }
   return result;
+}
+
+export function prepareEvidenceDirectory(outDir) {
+  if (outDir === undefined) return fs.mkdtempSync(path.join(os.tmpdir(), 'archify-typography-evidence-'));
+  const directory = path.resolve(outDir);
+  if (fs.existsSync(directory) && !fs.statSync(directory).isDirectory()) {
+    throw new Error(`Evidence output path must be a directory: ${directory}`);
+  }
+  fs.mkdirSync(directory, { recursive: true });
+  if (fs.readdirSync(directory).length) {
+    throw new Error(`Evidence output directory must be new or empty: ${directory}`);
+  }
+  return directory;
 }
 
 function execute(command, args, cwd) {
@@ -138,6 +152,8 @@ function benchmark(variants, output, runs, warmups) {
 async function main() {
   if (process.argv.includes('--help')) return usage();
   const config = options(process.argv.slice(2));
+  config.outDir = prepareEvidenceDirectory(config.outDir);
+  console.log(`Evidence output directory: ${config.outDir}`);
   if (process.versions.node !== '22.23.1' || process.versions.zlib !== '1.3.1-e00f703') {
     throw new Error(`Use official Node 22.23.1 / zlib 1.3.1-e00f703; got ${process.versions.node} / ${process.versions.zlib}.`);
   }
@@ -149,7 +165,6 @@ async function main() {
   if (hash(fs.readFileSync(path.join(config.candidateRepo, sourcePath))) !== hash(source)) {
     throw new Error('The candidate release workflow differs from the pinned source. Update the source map before comparing.');
   }
-  fs.mkdirSync(config.outDir, { recursive: true });
   const scratch = fs.mkdtempSync(path.join(os.tmpdir(), 'archify-typography-generation-'));
   const record = {
     schemaVersion: 1, status: 'running', generatedAt: new Date().toISOString(),
@@ -251,7 +266,9 @@ async function main() {
   }
 }
 
-main().catch(error => {
-  console.error(error.message);
-  process.exitCode = 1;
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  main().catch(error => {
+    console.error(error.message);
+    process.exitCode = 1;
+  });
+}

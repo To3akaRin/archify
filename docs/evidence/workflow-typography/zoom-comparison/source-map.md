@@ -60,7 +60,8 @@ WMS 的私有输入，也不用于推断那两个项目的全部图都能获益�
 
 ## 可重复生成
 
-`generate.mjs` 默认生成 HTML 和 `generation.json`，不运行性能循环或浏览器。
+`generate.mjs` 默认新建独立的临时证据目录，打印路径后在其中生成 HTML 和
+`generation.json`，不运行性能循环或浏览器。每次默认调用使用不同目录。
 它要求官方 Node **22.23.1 / zlib 1.3.1-e00f703**，并通过 `process.execPath` 为每个
 CLI 子进程固定同一运行时。运行前将以下两个路径替换为本机真实位置；候选仓库是当前
 命令执行的仓库，基线仓库必须检出上面的完整 SHA。
@@ -74,8 +75,13 @@ BASE_REPO="/absolute/path/to/archify-base"
 ```
 
 无需给基线安装 npm 依赖；脚本调用仓库自带的公开 `validate workflow ... --json`
-和 `render workflow ...` 命令。`--out-dir /absolute/path/to/output` 可以把生成文件放到
-其他目录，不改变输入或任何安装中的 Skill。
+和 `render workflow ...` 命令。`--out-dir /absolute/path/to/output` 只接受新目录或空目录；
+非空目录及普通文件路径会在写入任何产物前被拒绝，已有证据的字节保持不变。
+新 HTML 的截图和浏览器测量应重新采集到同一个新目录。
+
+本目录保留的 HTML、截图、测量及生成记录是 `3ceffd65` 归档的历史证据。
+其中 `generatorSha256` 继续指向当时的生成脚本；当前输出目录策略的修改不改写这些
+历史产物或摘要。命令不改变输入或任何安装中的 Skill。
 
 每个输入执行三个变体：
 

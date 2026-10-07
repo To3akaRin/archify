@@ -16,6 +16,8 @@
 - 这两图不冒充 #631 的 n14/WMS 私有输入。公开讨论尚未提供那两个项目的完整可重放 JSON，因此其真实验收仍需原报告者补充输入。
 
 运行时摘要、输入/HTML/SVG 摘要和 CLI 回执见 [generation.json](generation.json)。
+这些 HTML、截图和测量保留 `3ceffd65` 归档时的字节，`generatorSha256` 仍对应当时的脚本。
+当前生成脚本默认创建并打印新的临时目录；显式输出目录必须是新目录或空目录，以保持每组浏览器证据与其 HTML 对应。
 
 ## 对照方法
 
@@ -130,15 +132,18 @@
 
 ## 重放与当前验证
 
-先依 [source-map.md](source-map.md#可重复生成)准备固定基线，再在候选仓库根目录执行：
+先依 [source-map.md](source-map.md#可重复生成)准备固定基线，再在候选仓库根目录执行。
+将 `EVIDENCE_DIR` 设为一个新目录或空目录；本目录已经包含历史证据，重放结果应使用另一目录：
 
 ```sh
 NODE22="/absolute/path/to/node-v22.23.1/bin/node"
 BASE_REPO="/absolute/path/to/archify-base"
+EVIDENCE_DIR="/absolute/path/to/new-typography-evidence"
 "$NODE22" docs/evidence/workflow-typography/zoom-comparison/generate.mjs \
-  --base-repo "$BASE_REPO" --benchmark-runs 15 --benchmark-warmups 3
+  --base-repo "$BASE_REPO" --out-dir "$EVIDENCE_DIR" \
+  --benchmark-runs 15 --benchmark-warmups 3
 python3 -m http.server 8796 --bind 127.0.0.1 \
-  --directory docs/evidence/workflow-typography/zoom-comparison
+  --directory "$EVIDENCE_DIR"
 ```
 
 打开 `http://127.0.0.1:8796/release-overview/before.html` 和对应 after 页面，设定表中的视口，
